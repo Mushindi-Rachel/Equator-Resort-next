@@ -1,7 +1,4 @@
-export interface AdminDashboardProps {
-  onClose: () => void;
-  adminUser?: { id: string; email: string };
-}
+import type { Booking, Profile } from '@/lib/supabase';
 
 export type SidebarTab =
   | 'dashboard'
@@ -37,42 +34,98 @@ export interface ActivityLog {
 
 export interface Room {
   id: string;
+  room_number: string;
   name: string;
-  category: 'Executive Suite' | 'Deluxe' | 'Standard';
-  price: Record<string, number>;
+
   desc: string;
-  images: string[];
-  max_guests: number;
+
+  category: "Standard" | "Deluxe" | "Executive Suite";
+
+  badge: string | null;
+
+  status:
+    | "available"
+    | "occupied"
+    | "reserved"
+    | "cleaning"
+    | "maintenance";
+
   max_adults: number;
   max_children: number;
+  max_guests: number;
+
   size_sqm: number;
-  amenities: string[];
-  status: 'available' | 'occupied' | 'cleaning' | 'reserved' | 'maintenance';
+
   rating: number;
-  badge: string | null;
+
   created_at: string;
+
+  images: string[];
+
+  amenities: string[];
+
+  price: {
+    BB: number;
+    HB: number;
+    FB: number;
+    BO: number;
+    DAY_REST: number;
+  };
 }
 
-export interface BookingWithRelations {
-  id: string;
-  user_id?: string;
-  room_id?: string;
-  check_in: string;
-  check_out: string;
+export interface AdminDashboardProps {
+  onClose: () => void;
+  adminUser?: { id: string; email: string };
+}
+
+export type EnrichedBooking = Booking & {
+  rooms?: Room;
+  profiles?: Profile;
+  confirmation_status?: string;
+  mpesa_transaction_id?: string;
+};
+
+export interface NewBookingForm {
+  guestName: string;
+  guestEmail: string;
+ guestPhone: string;
+
+  checkIn: string;
+  checkOut: string;
+
   adults: number;
   children: number;
-  guest_name: string;
-  guest_email: string | null;
-  guest_phone: string | null;
-  payment_method: string;
-  mpesa_number: string | null;
-  payment_status: string;
-  total_amount: number | null;
-  booking_reference: string;
-  confirmation_status: string | null;
-  notes: string | null;
-  created_at: string;
-  rooms?: Room;
-  profiles?: { id: string; email: string } | null;
-  mpesa_transaction_id?: string;
+
+  roomId: string;
+
+  packageType: 'BB' | 'HB' | 'FB' | 'BO' | 'DAY_REST';
+
+  paymentMethod: string;
+  mpesaNumber: string;
+  paymentStatus: string;
+}
+
+export interface RoomPrice {
+  BB: number;
+  HB: number;
+  FB: number;
+  BO: number;
+  DAY_REST: number;
+}
+
+export interface NewReviewForm {
+  bookingId: string;
+  guestName: string;
+  guestEmail: string;
+  rating: number;
+  comment: string;
+}
+
+export interface SettingsForm {
+  taxRate: string;
+  checkinTime: string;
+  checkoutTime: string;
+  currency: string;
+  depositPercent: string;
+  cancellationPolicy: string;
 }

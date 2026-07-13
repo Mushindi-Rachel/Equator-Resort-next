@@ -13,7 +13,7 @@ import Gallery from '@/app/home/Gallery';
 import Blog from '@/app/home/Blog';
 import Contact from '@/app/home/Contact';
 import Footer from '@/app/home/Footer';
-import BookNow from '@/app/booking/BookNow';
+
 
 // import AuthModal from '@/components/auth/AuthModal';
 

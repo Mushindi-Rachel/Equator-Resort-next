@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { LayoutDashboard, Bell, Sun, Moon, UserCircle, LogOut, X } from 'lucide-react';
 import type { AdminDashboardProps, ActivityLog } from '../types';
 
@@ -29,6 +30,37 @@ export default function TopBar({
         <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-slate-400 hover:text-slate-700 transition-colors cursor-none">
           <LayoutDashboard size={18} />
         </button>
+        {/* Logo */}
+  <div className="relative">
+    <div className="absolute inset-0 rounded-full bg-gold-400/30 blur-xl scale-125 group-hover:bg-gold-400/50 transition-all duration-500"></div>
+
+    <div
+    className="
+      relative
+      w-18 h-18
+      rounded-xl
+      overflow-hidden
+      bg-white/10
+      backdrop-blur-md
+      border border-white/20
+      shadow-2xl
+      transition-all
+      duration-500
+      group-hover:scale-105
+      group-hover:border-gold-300
+      group-hover:shadow-gold-200/30
+    "
+  >
+      <Image
+        src="/logo-equator.png"
+        alt="Equator Christian Retreat & Conference Centre"
+        width={70}
+        height={70}
+        priority
+        className="object-contain"
+      />
+    </div>
+  </div>
         <div>
           <p className={`font-display tracking-[0.2em] uppercase text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>Equator</p>
           <p className={`text-[9px] tracking-[0.25em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Christian Retreat Centre</p>

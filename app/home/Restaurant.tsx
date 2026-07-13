@@ -20,7 +20,7 @@ const menus = [
     name: 'Dinner Service',
     items: ['Chef\'s special', 'Farm-to-table vegetables', 'Fresh catch of the day', 'Artisan breads', 'Decadent desserts'],
     time: '6:30 PM - 9:30 PM',
-    image: 'dinner2.jfif',
+    image: 'fish-special.jpeg',
   },
 ];
 

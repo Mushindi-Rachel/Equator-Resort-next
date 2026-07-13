@@ -1,40 +1,80 @@
-'use client';
-import { DoorOpen, DoorClosed, BedDouble, Home, CreditCard, Clock } from 'lucide-react';
-import KPICard from '../components/KPICard';
-import MiniBarChart from '../components/MiniBarChart';
-import type { BookingWithRelations, Room } from '../types';
-import { statusColor } from '../constants';
+import { BedDouble, CreditCard, Clock, DoorOpen, DoorClosed, Home } from 'lucide-react';
+import { KPICard } from '../components/KPICard';
+import { MiniBarChart } from '../components/MiniBarChart';
+import { statusColor } from '../utils';
+import type { EnrichedBooking, Room } from '../types';
 
-export default function DashboardTab({
-  todayArrivals, todayDepartures, occupiedRooms, totalRooms,
-  pendingConfirmations, expectedRevenue, totalRevenue,
-  monthlyData, roomPopularity, bookings, darkMode, openDrawer,
-  setTab,
-}: {
+interface Props {
+  darkMode: boolean;
+  bookings: EnrichedBooking[];
+  rooms: Room[];
+
   todayArrivals: number;
   todayDepartures: number;
+
   occupiedRooms: number;
+  availableRooms: number;
   totalRooms: number;
+
   pendingConfirmations: number;
+
   expectedRevenue: number;
   totalRevenue: number;
+
   monthlyData: { label: string; value: number }[];
   roomPopularity: { name: string; count: number }[];
-  bookings: BookingWithRelations[];
-  darkMode: boolean;
-  openDrawer: (b: BookingWithRelations) => void;
-  setTab: (t: any) => void;
-}) {
+
+  onViewAll: () => void;
+  onOpenDrawer: (booking: EnrichedBooking) => void;
+}
+
+export function DashboardTab({
+  darkMode,
+  bookings,
+  todayArrivals,
+  todayDepartures,
+  occupiedRooms,
+  availableRooms,
+  totalRooms,
+  pendingConfirmations,
+  expectedRevenue,
+  totalRevenue,
+  monthlyData,
+  roomPopularity,
+  onViewAll,
+  onOpenDrawer,
+}: Props) {
+  console.log({
+  totalRooms,
+  occupiedRooms,
+  availableRooms,
+  todayArrivals,
+  todayDepartures,
+});
   return (
     <div className="space-y-6">
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <KPICard label="Today's Arrivals" value={todayArrivals} sub={`${todayArrivals} guests`} icon={DoorOpen} color="bg-blue-500" trend="up" />
-        <KPICard label="Today's Departures" value={todayDepartures} sub={`${todayDepartures} guests`} icon={DoorClosed} color="bg-slate-500" trend="neutral" />
-        <KPICard label="Rooms Occupied" value={`${Math.min(occupiedRooms, totalRooms)} / ${totalRooms}`} sub={`${Math.round((Math.min(occupiedRooms, totalRooms) / totalRooms) * 100)}% occupancy`} icon={BedDouble} color="bg-purple-500" trend="up" />
-        <KPICard label="Available Rooms" value={Math.max(0, totalRooms - occupiedRooms)} sub="ready for booking" icon={Home} color="bg-emerald-500" trend="neutral" />
-        <KPICard label="Expected Revenue" value={`$${expectedRevenue.toLocaleString()}`} sub="paid bookings" icon={CreditCard} color="bg-amber-500" trend="up" />
-        <KPICard label="Pending" value={pendingConfirmations} sub="need confirmation" icon={Clock} color="bg-red-500" trend="down" />
+        <KPICard label="Today's Arrivals"   value={todayArrivals}   sub={`${todayArrivals} guests`}   icon={DoorOpen}   color="bg-blue-500"   trend="up" />
+        <KPICard label="Today's Departures" value={todayDepartures} sub={`${todayDepartures} guests`} icon={DoorClosed}  color="bg-slate-500"  trend="neutral" />
+        <KPICard
+          label="Rooms Occupied"
+          value={`${occupiedRooms} / ${totalRooms}`}
+          sub={`${Math.round((occupiedRooms / totalRooms) * 100)}% occupancy`}
+          icon={BedDouble}
+          color="bg-purple-500"
+          trend="up"
+        />
+        <KPICard
+            label="Available Rooms"
+            value={availableRooms}
+            sub="ready for booking"
+            icon={Home}
+            color="bg-emerald-500"
+            trend="neutral"
+          />
+        <KPICard label="Expected Revenue"   value={`$${expectedRevenue.toLocaleString()}`} sub="paid bookings"    icon={CreditCard} color="bg-amber-500"  trend="up" />
+        <KPICard label="Pending"            value={pendingConfirmations} sub="need confirmation"        icon={Clock}      color="bg-red-500"    trend="down" />
       </div>
 
       {/* Charts Row */}
@@ -42,9 +82,10 @@ export default function DashboardTab({
         <div className={`rounded-xl border p-5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           <p className={`text-xs font-semibold tracking-wider uppercase mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Monthly Revenue</p>
           <MiniBarChart data={monthlyData} color="#d97706" />
-          <p className={`text-xs mt-3 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Total: <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>${totalRevenue.toLocaleString()}</strong></p>
+          <p className={`text-xs mt-3 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+            Total: <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>${totalRevenue.toLocaleString()}</strong>
+          </p>
         </div>
-
         <div className={`rounded-xl border p-5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           <p className={`text-xs font-semibold tracking-wider uppercase mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Room Popularity</p>
           {roomPopularity.length === 0 ? (
@@ -66,14 +107,15 @@ export default function DashboardTab({
         </div>
       </div>
 
-      {/* Recent bookings */}
+      {/* Recent Bookings */}
       <div className={`rounded-xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
         <div className={`flex items-center justify-between px-5 py-4 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <p className={`text-xs font-semibold tracking-wider uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Recent Bookings</p>
-          <button onClick={() => setTab('bookings')} className="text-xs text-amber-600 hover:text-amber-700 cursor-none">View all →</button>
+          <button onClick={onViewAll} className="text-xs text-amber-600 hover:text-amber-700 cursor-none">View all →</button>
         </div>
         {bookings.slice(0, 5).map(b => (
-          <div key={b.id} onClick={() => openDrawer(b)} className={`flex items-center justify-between px-5 py-3 border-b last:border-0 cursor-none transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-50 hover:bg-slate-50'}`}>
+          <div key={b.id} onClick={() => onOpenDrawer(b)}
+            className={`flex items-center justify-between px-5 py-3 border-b last:border-0 cursor-none transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-50 hover:bg-slate-50'}`}>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
                 <span className="text-amber-700 text-xs font-bold">{b.guest_name?.charAt(0)}</span>

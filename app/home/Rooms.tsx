@@ -1,74 +1,79 @@
 'use client';
 
 import { Eye } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Image from "next/image";
+import { useRouter} from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { supabase } from "@/lib/supabase";
 
-const rooms = [
-  {
-    id: "standard-single",
-    name: "Standard Single",
-    price: 4500,
-    size: "25 m²",
-    image: "/single-standard-room.webp?auto=compress&cs=tinysrgb&w=800",
-    category: "Standard",
-    badge: "",
-  },
-  {
-    id: "standard-double",
-    name: "Standard Double",
-    price: 5500,
-    size: "30 m²",
-    image: "/double-standard-room.webp?auto=compress&cs=tinysrgb&w=800",
-  },
-  {
-    id: "deluxe-single",
-    name: "Deluxe Single",
-    price: 6000,
-    size: "35 m²",
-    image: "/single-deluxe-room.avif?auto=compress&cs=tinysrgb&w=800",
-    category: "Deluxe",
-    badge: "",
-  },
-  {
-    id: "deluxe-double",
-    name: "Deluxe Double",
-    price: 7000,
-    size: "45 m²",
-    image: "/doble-deluxe-room.jpeg?auto=compress&cs=tinysrgb&w=800",
-    category: "Deluxe",
-    badge: "Family Pick",
-  },
-  {
-    id: "equator-suite",
-    name: "Equator Suite Double",
-    price: 16000,
-    size: "80 m²",
-    image: "/exec-room.webp?auto=compress&cs=tinysrgb&w=800",
-    category: "Suite",
-    badge: "Signature",
-  },
+interface RoomCategory {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  badge: string | null;
+  bb_price: number;
+  hb_price: number;
+  fb_price: number;
+  bo_price: number;
+  day_rest_price: number;
+  display_order: number;
+}
+const amenities = [
+    "Free WiFi",
+    "Smart TV",
+    "Breakfast Included",
+    "Hot Shower",
+    "Room Service",
 ];
+
 export default function Rooms() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<RoomCategory[]>([]);
 
-  const [roomId, setRoomId] = useState<string | null>(null);
+useEffect(() => {
+  loadCategories();
+}, []);
 
-  useEffect(() => {
-    const id = searchParams.get('room');
-    if (id) setRoomId(id);
-  }, [searchParams]);
+async function loadCategories() {
+  setLoading(true);
 
-  const goToBooking = (id: string) => {
-    router.push(`/booking?room=${id}`);
-  };
+  try {
+    const { data, error } = await supabase
+      .from("room_categories")
+      .select("*")
+      .order("display_order");
 
+    if (error) throw error;
+
+    setCategories(data ?? []);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+}
+
+    const goToBooking = (categoryId: string) => {
+  router.push(`/booking?category=${categoryId}`);
+};
+if (loading) {
+  return (
+    <section className="py-28">
+      <div className="text-center">
+        Loading rooms...
+      </div>
+    </section>
+  );
+}
+
+console.log(categories);
 
   return (
     <section id="rooms" className="py-28 bg-sanctuary-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16 reveal">
+        <div className="text-center mb-16">
           <p className="section-label mb-4">Accommodations</p>
           <div className="section-divider mb-6" />
           <h2 className="font-serif text-sanctuary-900 mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', lineHeight: '1.15' }}>
@@ -81,13 +86,19 @@ export default function Rooms() {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {rooms.map((room) => (
-            <div key={room.id} className="reveal reveal-scale bg-white card-luxury group">
+          {categories.map((category) => (
+            <div key={category.id} className="bg-white card-luxury group">
               <div className="img-overlay aspect-[4/3] overflow-hidden relative">
-                <img src={room.image} alt={room.name} className="w-full h-full object-cover" />
-                {room.badge && (
+                <Image
+  src={category.image}
+  alt={category.name}
+  fill
+  unoptimized
+  className="object-cover"
+/>
+                {category.badge && (
                   <div className="absolute top-4 left-4 z-20 bg-gold-500 text-sanctuary-900 px-3 py-1">
-                    <span className="font-sans text-[10px] font-bold tracking-widest uppercase">{room.badge}</span>
+                    <span className="font-sans text-[10px] font-bold tracking-widest uppercase">{category.badge}</span>
                   </div>
                 )}
               </div>
@@ -95,12 +106,17 @@ export default function Rooms() {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="section-label mb-1" style={{ fontSize: '10px' }}>{room.category} &middot; {room.size}</p>
-                    <h3 className="font-serif text-sanctuary-900 text-xl">{room.name}</h3>
+                    <h3 className="font-serif text-xl text-sanctuary-900">
+  {category.name}
+</h3>
+
+{/* <p className="mt-2 text-sm text-sanctuary-600 line-clamp-3">
+  {category.description}
+</p> */}
                   </div>
                   <div className="text-right">
                     <p className="font-sans text-[11px] text-sanctuary-400 uppercase tracking-wider">from</p>
-                    <p className="font-display text-sanctuary-900 text-2xl">KSh {room.price.toLocaleString()}</p>
+                    <p className="font-display text-sanctuary-900 text-2xl">KSh {(category.bb_price ?? 0).toLocaleString()}</p>
                     <p className="font-sans text-[11px] text-sanctuary-400">BB (Bed & Breakfast)</p>
                   </div>
                 </div>
@@ -111,13 +127,13 @@ export default function Rooms() {
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 mb-5">
-                  {['Free WiFi', 'Smart TV', 'Breakfast Included', 'Hot Shower', 'Room Service'].map(a => (
+                  {amenities.map((a) => (
                     <span key={a} className="bg-sanctuary-50 text-sanctuary-600 font-sans text-[10px] px-2 py-0.5">&#10003; {a}</span>
                   ))}
                 </div>
 
                 <button
-                onClick={() => goToBooking(room.id)}
+                onClick={() => goToBooking(category.id)}
                 className="btn-gold w-full justify-center text-[11px] py-3"
               >
                   Reserve This Room
@@ -126,7 +142,7 @@ export default function Rooms() {
             </div>
           ))}
         </div>
-      </div>
+          </div>
     </section>
   );
 }

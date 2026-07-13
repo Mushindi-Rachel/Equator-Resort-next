@@ -21,6 +21,11 @@ body {
     cursor: none;
 }
 
+.admin-site,
+.admin-site * {
+    cursor: auto;
+}
+
 .cursor-dot {
     width: 8px;
     height: 8px;

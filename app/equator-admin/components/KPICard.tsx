@@ -1,14 +1,15 @@
-'use client';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
-export default function KPICard({ label, value, sub, icon: Icon, trend, color }: {
+interface KPICardProps {
   label: string;
   value: string | number;
   sub?: string;
   icon: React.ElementType;
   trend?: 'up' | 'down' | 'neutral';
   color: string;
-}) {
+}
+
+export function KPICard({ label, value, sub, icon: Icon, trend, color }: KPICardProps) {
   return (
     <div className="bg-white rounded-xl border border-slate-100 p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
@@ -23,8 +24,11 @@ export default function KPICard({ label, value, sub, icon: Icon, trend, color }:
       </div>
       {trend && (
         <div className={`flex items-center gap-1 text-xs font-sans font-semibold ${trend === 'up' ? 'text-emerald-600' : trend === 'down' ? 'text-red-500' : 'text-slate-400'}`}>
-          {trend === 'up' ? <ArrowUpRight size={13} /> : trend === 'down' ? <ArrowDownRight size={13} /> : null}
-          {trend === 'up' ? '+12% vs last week' : trend === 'down' ? '-3% vs last week' : 'No change'}
+          {trend === 'up'   ? <ArrowUpRight size={13} />   : null}
+          {trend === 'down' ? <ArrowDownRight size={13} /> : null}
+          {trend === 'up'      ? '+12% vs last week'  : ''}
+          {trend === 'down'    ? '-3% vs last week'   : ''}
+          {trend === 'neutral' ? 'No change'          : ''}
         </div>
       )}
     </div>

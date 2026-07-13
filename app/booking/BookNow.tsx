@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react';
+import Image from "next/image";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { rooms } from "@/lib/rooms";
+// import { rooms } from "@/lib/rooms";
 import { supabase } from '@/lib/supabase';
 import {
   Phone, ChevronRight, ChevronLeft, Check, CreditCard,
@@ -25,6 +26,7 @@ function nightsBetween(start: string, end: string) {
   return diff > 0 ? diff : 0;
 }
 
+
 const PACKAGE_LABELS: Record<PackageType, string> = {
   BB: 'Bed & Breakfast',
   HB: 'Half Board',
@@ -39,16 +41,73 @@ const VALID_PACKAGES: PackageType[] = ['BB', 'HB', 'FB', 'BO', 'DAY_REST'];
 export default function BookNow() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  
   // Step
   const [step, setStep] = useState(1);
 
   // Step 1 state
-  const [roomId, setRoomId] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [availability, setAvailability] = useState(0);
   const [packageType, setPackageType] = useState<PackageType>('BB');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(1);
+
+  const [loadingCategory, setLoadingCategory] = useState(true);
+  
+async function loadSelectedCategory(id: string) {
+  setLoadingCategory(true);
+
+  try {
+    const { data, error } = await supabase
+      .from("room_categories")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
+    setSelectedCategory(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingCategory(false);
+  }
+}
+
+  useEffect(() => {
+  const id = searchParams.get("category");
+
+  if (id) {
+    loadSelectedCategory(id);
+  }
+}, [searchParams]);
+
+
+  async function checkAvailability(categoryId: string) {
+
+  if (!checkIn) return;
+
+  const { count } = await supabase
+    .from("rooms")
+    .select("*", { count: "exact", head: true })
+    .eq("category_id", categoryId)
+    .eq("status", "available");
+
+  setAvailability(count || 0);
+}
+
+useEffect(() => {
+
+  if(selectedCategory){
+
+      checkAvailability(selectedCategory.id);
+
+  }
+
+}, [selectedCategory, checkIn, checkOut]);
+
+
 
   // Step 2 state
   const [name, setName] = useState('');
@@ -65,50 +124,120 @@ export default function BookNow() {
 
   // ─── Read URL params ──────────────────────────────────────────────────────
   useEffect(() => {
-    const roomParam = searchParams.get('room');
+    
     const pkgParam = searchParams.get('package') as PackageType | null;
 
-    if (roomParam) setRoomId(roomParam);
     if (pkgParam && VALID_PACKAGES.includes(pkgParam)) setPackageType(pkgParam);
   }, [searchParams]);
 
   // ─── Derived values ───────────────────────────────────────────────────────
-  const selectedRoom = rooms.find(r => r.id === roomId) ?? rooms[0];
   const nights = nightsBetween(checkIn, checkOut);
-  const selectedPrice = selectedRoom?.price?.[packageType] ?? 0;
-  const totalAmount = packageType === 'DAY_REST' ? selectedPrice : selectedPrice * nights;
 
+const selectedPrice =
+  selectedCategory
+    ? selectedCategory[`${packageType.toLowerCase()}_price`] ?? 0
+    : 0;
+
+const totalAmount =
+  packageType === "DAY_REST"
+    ? selectedPrice
+    : selectedPrice * nights;
+  
   // ─── Handlers ─────────────────────────────────────────────────────────────
-  function handleRoomChange(id: string) {
-    setRoomId(id);
-    const room = rooms.find(r => r.id === id);
-    // If new room doesn't support current package, reset to BB
-    if (room && !room.price[packageType]) {
-      setPackageType('BB');
-    }
-  }
 
   async function handleSubmit() {
     setLoading(true);
     setError('');
     const ref = generateBookingRef();
 
-    try {
-      const { error: bookingError } = await supabase.from('bookings').insert({
-        booking_reference: ref,
-        guest_name: name,
-        email,
-        phone,
-        room_id: roomId,
-        check_in: checkIn,
-        check_out: checkOut,
-        number_of_guests: guests,
-        package_type: packageType,
-        total_amount: totalAmount,
-        booking_status: 'Pending',
-      });
+    const { data: room, error: roomError } = await supabase
+  .from("rooms")
+  .select("id")
+  .eq("category_id", selectedCategory.id)
+  .eq("status", "Available")
+  .limit(1)
+  .single();
+  
+  if (roomError || !room) {
+  throw new Error("No rooms are available for this category.");
+}
 
-      if (bookingError) throw bookingError;
+    try {
+      const bookingPayload = {
+  booking_reference: ref,
+
+  room_id: room.id,
+
+  guest_name: name,
+  guest_email: email,
+  guest_phone: phone,
+
+  check_in: checkIn,
+  check_out: checkOut,
+
+  number_of_guests: guests,
+
+  package_type: packageType,
+
+  payment_method:
+    paymentMethod === "mpesa"
+      ? "M-Pesa"
+      : paymentMethod,
+
+  payment_status: "pending",
+
+  total_amount: totalAmount,
+
+  booking_status: "pending",
+};
+
+console.log("BOOKING PAYLOAD", bookingPayload);
+
+const { error: bookingError } = await supabase
+  .from("bookings")
+  .insert(bookingPayload);
+  //     const { error: bookingError } = await supabase
+  // .from("bookings")
+  // .insert({
+  //   booking_reference: ref,
+
+  //   room_id: room.id,
+
+  //   guest_name: name,
+  //   guest_email: email,
+  //   guest_phone: phone,
+
+  //   check_in: checkIn,
+  //   check_out: checkOut,
+
+  //   number_of_guests: guests,
+
+  //   package_type: packageType,
+
+  //   payment_method:
+  //     paymentMethod === "mpesa"
+  //       ? "M-Pesa"
+  //       : paymentMethod,
+
+  //   payment_status: "pending",
+
+  //   total_amount: totalAmount,
+
+  //   booking_status: "pending",
+  // });
+
+      if (bookingError) {
+  console.log("BOOKING ERROR:", bookingError);
+  throw bookingError;
+}
+    const { error: roomUpdateError } = await supabase
+  .from("rooms")
+  .update({
+    status: "Reserved",
+  })
+  .eq("id", room.id);
+
+if (roomUpdateError) throw roomUpdateError;
 
       const { data: bookingData } = await supabase
         .from('bookings')
@@ -125,7 +254,7 @@ export default function BookNow() {
             paymentMethod === 'visa' ? 'Visa' : 'Mastercard',
           amount: totalAmount,
           currency: 'KES',
-          payment_status: 'Pending',
+          payment_status: 'pending',
         });
       }
 
@@ -140,8 +269,11 @@ export default function BookNow() {
 
   // ─── Validation ───────────────────────────────────────────────────────────
   const canProceedStep1 =
-    roomId && checkIn && checkOut && guests > 0 &&
-    (packageType === 'DAY_REST' || nights > 0);
+    selectedCategory &&
+    checkIn &&
+    (packageType === "DAY_REST" || checkOut) &&
+    guests > 0 &&
+    (packageType === "DAY_REST" || nights > 0);
   const canProceedStep2 = name && email && phone;
 
   // ─── Shared summary card ──────────────────────────────────────────────────
@@ -150,7 +282,7 @@ export default function BookNow() {
       <div className="bg-sanctuary-50 p-5 border-l-4 border-gold-400">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-serif text-sanctuary-900 text-[15px]">{selectedRoom?.name}</p>
+            <p className="font-serif text-sanctuary-900 text-[15px]">{selectedCategory?.name}</p>
             <p className="font-sans text-sanctuary-500 text-[12px]">
               {PACKAGE_LABELS[packageType]} •{' '}
               {packageType === 'DAY_REST'
@@ -163,6 +295,29 @@ export default function BookNow() {
       </div>
     );
   }
+
+  if (loadingCategory) {
+  return (
+    <section className="min-h-screen flex items-center justify-center">
+      Loading room...
+    </section>
+  );
+}
+
+if (!selectedCategory) {
+  return (
+    <section className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <h2 className="text-2xl font-serif">Room not found</h2>
+
+      <button
+        onClick={() => router.push("/#rooms")}
+        className="btn-gold"
+      >
+        Browse Rooms
+      </button>
+    </section>
+  );
+}
 // "relative min-h-screen py-20 overflow-hidden bg-cover bg-center"
   // ─── Render ───────────────────────────────────────────────────────────────
  return (
@@ -249,51 +404,78 @@ export default function BookNow() {
           {/* ── Step 1: Room & Dates ── */}
           {step === 1 && (
             <div className="space-y-8">
-              <h3 className="font-serif text-sanctuary-900 text-xl">Step 1: Select Room & Dates</h3>
+              <h3 className="font-serif text-sanctuary-900 text-xl">Step 1: Select Room Package & Dates</h3>
 
-              {/* Room grid */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                {rooms.map((room) => (
-                  <button
-                    key={room.id}
-                    onClick={() => handleRoomChange(room.id)}
-                    className={`text-left border-2 transition-all duration-300 overflow-hidden
-                      ${roomId === room.id ? 'border-gold-500' : 'border-transparent hover:border-sanctuary-200'}`}
-                  >
-                    <div className="aspect-[3/2] overflow-hidden">
-                      <img src={room.image} alt={room.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-4 bg-cream-50">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-serif text-sanctuary-900 text-[15px]">{room.name}</h4>
-                        <span className="font-sans text-gold-600 text-[13px] font-medium">
-                          from KSh {room.price.BB.toLocaleString()}/night
-                        </span>
-                      </div>
-                      <p className="font-sans text-sanctuary-500 text-[12px] leading-relaxed">{room.desc}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <div className="rounded-xl border border-sanctuary-100 overflow-hidden">
+    <img
+  src={selectedCategory?.image}
+  alt={selectedCategory?.name}
+  className="w-full h-64 object-cover"
+/>
+    <div className="p-6">
+
+        <h3 className="font-serif text-2xl">
+            {selectedCategory?.name}
+        </h3>
+
+        <p className="mt-2 text-sanctuary-600">
+            {selectedCategory?.description}
+        </p>
+
+        <div className="mt-4 flex gap-6">
+            <span>
+                From KSh {(selectedCategory?.bb_price ?? 0).toLocaleString()}
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
 
               {/* Meal plan */}
               <div>
                 <label className="block font-sans text-[11px] text-sanctuary-400 tracking-wider uppercase mb-2">
-                  Meal Plan
+                  Package
                 </label>
                 <select
                   value={packageType}
                   onChange={(e) => setPackageType(e.target.value as PackageType)}
                   className="w-full px-4 py-3 bg-cream-50 border border-sanctuary-100 font-sans text-sanctuary-700 text-sm focus:outline-none focus:border-gold-400 transition-colors"
                 >
-                  {selectedRoom &&
-                    Object.entries(selectedRoom.price)
-                      .filter(([, value]) => value > 0)
-                      .map(([key, value]) => (
-                        <option key={key} value={key}>
-                          {PACKAGE_LABELS[key as PackageType]} ({key}) — KSh {value.toLocaleString()}
-                        </option>
-                      ))}
+                  {selectedCategory && (
+<>
+    {selectedCategory.bb_price > 0 && (
+        <option value="BB">
+            Bed & Breakfast — KSh {(selectedCategory?.bb_price ?? 0).toLocaleString()}
+        </option>
+    )}
+
+    {selectedCategory.hb_price > 0 && (
+        <option value="HB">
+            Half Board — KSh {(selectedCategory?.hb_price ?? 0).toLocaleString()}
+        </option>
+    )}
+
+    {selectedCategory.fb_price > 0 && (
+        <option value="FB">
+            Full Board — KSh {(selectedCategory?.fb_price ?? 0).toLocaleString()}
+        </option>
+    )}
+
+    {selectedCategory.bo_price > 0 && (
+        <option value="BO">
+            Bed Only — KSh {(selectedCategory?.bo_price ?? 0).toLocaleString()}
+        </option>
+    )}
+
+    {selectedCategory.day_rest_price > 0 && (
+        <option value="DAY_REST">
+            Day Rest — KSh {selectedCategory.day_rest_price.toLocaleString()}
+        </option>
+    )}
+</>
+)}
                 </select>
               </div>
 
@@ -344,7 +526,7 @@ export default function BookNow() {
               </div>
 
               {/* Price summary — only show when we have enough info */}
-              {selectedRoom && (packageType === 'DAY_REST' || nights > 0) && (
+              {selectedCategory && (packageType === 'DAY_REST' || nights > 0) && (
                 <PriceSummary />
               )}
 
@@ -453,7 +635,7 @@ export default function BookNow() {
               <div className="bg-sanctuary-900 p-6 text-cream-50">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="font-serif text-gold-400 text-[15px]">{selectedRoom?.name}</p>
+                    <p className="font-serif text-gold-400 text-[15px]">{selectedCategory?.name}</p>
                     <p className="font-sans text-cream-100 text-[12px]">
                       {name} · {PACKAGE_LABELS[packageType]} ·{' '}
                       {packageType === 'DAY_REST' ? 'Day visit' : `${nights} night${nights !== 1 ? 's' : ''}`} ·{' '}
@@ -502,7 +684,7 @@ export default function BookNow() {
 
               <div className="bg-cream-50 p-5 max-w-sm mx-auto text-left space-y-2">
                 {[
-                  { label: 'Room', value: selectedRoom?.name },
+                  { label: 'Room', value: selectedCategory?.name },
                   { label: 'Package', value: PACKAGE_LABELS[packageType] },
                   { label: 'Dates', value: packageType === 'DAY_REST' ? checkIn : `${checkIn} → ${checkOut}` },
                   { label: 'Guests', value: guests },

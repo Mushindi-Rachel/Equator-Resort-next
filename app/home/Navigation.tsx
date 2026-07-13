@@ -69,23 +69,6 @@ export default function Navigation({ onBookNow, user, isAdmin, onAdminOpen, onSi
   <div className="relative">
     <div className="absolute inset-0 rounded-full bg-gold-400/30 blur-xl scale-125 group-hover:bg-gold-400/50 transition-all duration-500"></div>
 
-    <div
-    className="
-      relative
-      w-18 h-18
-      rounded-xl
-      overflow-hidden
-      bg-white/10
-      backdrop-blur-md
-      border border-white/20
-      shadow-2xl
-      transition-all
-      duration-500
-      group-hover:scale-105
-      group-hover:border-gold-300
-      group-hover:shadow-gold-200/30
-    "
-  >
       <Image
         src="/logo-equator.png"
         alt="Equator Christian Retreat & Conference Centre"
@@ -95,7 +78,7 @@ export default function Navigation({ onBookNow, user, isAdmin, onAdminOpen, onSi
         className="object-contain"
       />
     </div>
-  </div>
+
 
   {/* Text */}
   <div className="flex flex-col items-start">
