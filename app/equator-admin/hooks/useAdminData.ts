@@ -47,9 +47,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
   const [reviews, setReviews]     = useState<Review[]>([]);
   const [loading, setLoading]     = useState(true);
   const [activityLog, setActivityLog] = useState<ActivityLog[]>([]);
-  const [housekeepingStatus, setHousekeepingStatus] =
-    useState<Record<string, 'clean' | 'cleaning' | 'maintenance'>>({});
-
+  
   // ── New booking form ──────────────────────────────────────────────────────
   const [newBooking, setNewBooking]         = useState<NewBookingForm>(DEFAULT_BOOKING);
   const [savingBooking, setSavingBooking]   = useState(false);
@@ -83,9 +81,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
   if (categoriesRes.data) {
     setCategories(categoriesRes.data);
 }
-console.log("CATEGORIES RESPONSE:", categoriesRes);
-console.log("CATEGORIES DATA:", categoriesRes.data);
-console.log("CATEGORIES ERROR:", categoriesRes.error);
+
 
     const bookingsRes = await supabase
   .from('bookings')
@@ -125,7 +121,9 @@ console.log("🔥 NEW QUERY RUNNING");
     )
   `)
   .order("room_number");
-
+  console.log("ROOMS RESPONSE", roomsRes);
+console.log("ROOMS ERROR", roomsRes.error);
+console.log("ROOMS DATA", roomsRes.data);
     const [reviewsRes] = await Promise.all([
       supabase.from('reviews').select('*').order('created_at', { ascending: false }),
     ]);
@@ -141,7 +139,7 @@ console.log("🔥 NEW QUERY RUNNING");
 
             room_number: b.rooms.room_number,
 
-            name: b.rooms.name,
+            name: b.rooms.room_name,
 
             desc: b.rooms.description ?? "",
 
@@ -242,21 +240,22 @@ console.log("🔥 NEW QUERY RUNNING");
   }))
 );
 roomsRes.data.forEach(room => {
-  console.log({
-    room: room.room_number,
-    category: room.category,
-    raw: room,
-  });
+  // console.log({
+  //   room: room.room_number,
+  //   category: room.category,
+  //   raw: room,
+  // });
+//   console.log("ROOMS DATA:", roomsRes.data);
+// console.log("ROOMS ERROR:", roomsRes.error);
+  
 });
 
-      const hs: Record<string, 'clean' | 'cleaning' | 'maintenance'> = {};
-      roomsRes.data.forEach(r => { hs[r.id] = 'clean'; });
-      setHousekeepingStatus(hs);
     }
     if (reviewsRes.data) setReviews(reviewsRes.data as Review[]);
     addLog('Dashboard data refreshed', 'system');
     setLoading(false);
   };
+  
 
   useEffect(() => { loadData(); }, []);
 
@@ -573,6 +572,30 @@ if (error) throw error;
     } finally { setSavingReview(false); }
   };
 
+  const updateHousekeeping = async (
+  roomId: string,
+  status: "clean" | "cleaning" | "maintenance"
+) => {
+  const roomStatus =
+    status === "clean"
+      ? "Available"
+      : status === "cleaning"
+      ? "Cleaning"
+      : "Maintenance";
+
+  const { error } = await supabase
+    .from("rooms")
+    .update({
+      status: roomStatus,
+    })
+    .eq("id", roomId);
+
+  if (error) throw error;
+
+  addLog(`Room status changed to ${roomStatus}`, "room");
+
+  await loadData();
+};
   // ── Toggle review published ───────────────────────────────────────────────
   const toggleReviewPublished = async (reviewId: string, current: boolean) => {
     await supabase.from('reviews').update({ is_published: !current }).eq('id', reviewId);
@@ -590,7 +613,7 @@ console.log({
   return {
     // data
     todayArrivals, todayDepartures, totalRooms, occupiedRooms, availableRooms, reservedRooms, cleaningRooms, maintenanceRooms,
-    bookings, rooms, reviews, loading, activityLog, housekeepingStatus, setHousekeepingStatus, categories, addRoom, updateRoom, deleteRoom,
+    bookings, rooms, reviews, loading, activityLog, categories, addRoom, updateRoom, deleteRoom,
     // booking form
     newBooking, setNewBooking, savingBooking, bookingError, bookingSuccess,
     handleNewBooking,
@@ -599,6 +622,6 @@ console.log({
     // settings
     settings, setSettings,
     // actions
-    loadData, addLog, updateConfirmation,
+    loadData, addLog, updateConfirmation, updateHousekeeping,
   };
 }

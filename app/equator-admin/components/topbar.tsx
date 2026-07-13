@@ -27,7 +27,7 @@ export default function TopBar({
   return (
     <div className={`flex items-center justify-between px-5 py-3 flex-shrink-0 border-b ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`} style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
       <div className="flex items-center gap-3">
-        <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-slate-400 hover:text-slate-700 transition-colors cursor-none">
+        <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer">
           <LayoutDashboard size={18} />
         </button>
         {/* Logo */}
@@ -62,14 +62,14 @@ export default function TopBar({
     </div>
   </div>
         <div>
-          <p className={`font-display tracking-[0.2em] uppercase text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>Equator</p>
+          <p className={`font-display tracking-[0.2em] uppercase text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-700'}`}>ADMIN DASHBOARD</p>
           <p className={`text-[9px] tracking-[0.25em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Christian Retreat Centre</p>
         </div>
       </div>
       <div className="flex items-center gap-2">
         {/* Notifications */}
         <div className="relative">
-          <button onClick={() => setNotifOpen(!notifOpen)} className={`relative p-2 rounded-lg transition-colors cursor-none ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
+          <button onClick={() => setNotifOpen(!notifOpen)} className={`relative p-2 rounded-lg transition-colors cursor-pointer ${darkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}>
             <Bell size={17} />
             {notifications.length > 0 && (
               <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">{notifications.length}</span>
@@ -97,7 +97,7 @@ export default function TopBar({
         </div>
 
         {/* Dark mode */}
-        <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-lg transition-colors cursor-none ${darkMode ? 'hover:bg-slate-800 text-amber-400' : 'hover:bg-slate-100 text-slate-500'}`}>
+        <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-lg transition-colors cursor-pointer ${darkMode ? 'hover:bg-slate-800 text-amber-400' : 'hover:bg-slate-100 text-slate-500'}`}>
           {darkMode ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
@@ -105,10 +105,10 @@ export default function TopBar({
           <UserCircle size={15} className={darkMode ? 'text-slate-400' : 'text-slate-500'} />
           <span className={`text-xs ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>{adminUser?.email}</span>
         </div>
-        <button onClick={onClose} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-none ${darkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800' : 'text-slate-500 hover:text-red-500 hover:bg-red-50'}`}>
+        <button onClick={onClose} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${darkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800' : 'text-slate-500 hover:text-red-500 hover:bg-red-50'}`}>
           <LogOut size={13} /> Sign out
         </button>
-        <button onClick={onClose} className={`p-1.5 transition-colors cursor-none ${darkMode ? 'text-slate-500 hover:text-slate-200' : 'text-slate-400 hover:text-slate-700'}`}>
+        <button onClick={onClose} className={`p-1.5 transition-colors cursor-pointer ${darkMode ? 'text-slate-500 hover:text-slate-200' : 'text-slate-400 hover:text-slate-700'}`}>
           <X size={16} />
         </button>
       </div>

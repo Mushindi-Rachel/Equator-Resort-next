@@ -44,15 +44,9 @@ export function DashboardTab({
   onViewAll,
   onOpenDrawer,
 }: Props) {
-  console.log({
-  totalRooms,
-  occupiedRooms,
-  availableRooms,
-  todayArrivals,
-  todayDepartures,
-});
+  
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 cursor-pointer">
       {/* KPI Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <KPICard label="Today's Arrivals"   value={todayArrivals}   sub={`${todayArrivals} guests`}   icon={DoorOpen}   color="bg-blue-500"   trend="up" />
@@ -73,7 +67,7 @@ export function DashboardTab({
             color="bg-emerald-500"
             trend="neutral"
           />
-        <KPICard label="Expected Revenue"   value={`$${expectedRevenue.toLocaleString()}`} sub="paid bookings"    icon={CreditCard} color="bg-amber-500"  trend="up" />
+        <KPICard label="Expected Revenue"   value={`Ksh. ${expectedRevenue.toLocaleString()}`} sub="paid bookings"    icon={CreditCard} color="bg-amber-500"  trend="up" />
         <KPICard label="Pending"            value={pendingConfirmations} sub="need confirmation"        icon={Clock}      color="bg-red-500"    trend="down" />
       </div>
 
@@ -83,7 +77,7 @@ export function DashboardTab({
           <p className={`text-xs font-semibold tracking-wider uppercase mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Monthly Revenue</p>
           <MiniBarChart data={monthlyData} color="#d97706" />
           <p className={`text-xs mt-3 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
-            Total: <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>${totalRevenue.toLocaleString()}</strong>
+            Total: <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>Ksh. {totalRevenue.toLocaleString()}</strong>
           </p>
         </div>
         <div className={`rounded-xl border p-5 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
@@ -111,11 +105,11 @@ export function DashboardTab({
       <div className={`rounded-xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
         <div className={`flex items-center justify-between px-5 py-4 border-b ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
           <p className={`text-xs font-semibold tracking-wider uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Recent Bookings</p>
-          <button onClick={onViewAll} className="text-xs text-amber-600 hover:text-amber-700 cursor-none">View all →</button>
+          <button onClick={onViewAll} className="text-xs text-amber-600 hover:text-amber-700 cursor-pointer">View all →</button>
         </div>
         {bookings.slice(0, 5).map(b => (
           <div key={b.id} onClick={() => onOpenDrawer(b)}
-            className={`flex items-center justify-between px-5 py-3 border-b last:border-0 cursor-none transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-50 hover:bg-slate-50'}`}>
+            className={`flex items-center justify-between px-5 py-3 border-b last:border-0 cursor-pointer transition-colors ${darkMode ? 'border-slate-800 hover:bg-slate-800' : 'border-slate-50 hover:bg-slate-50'}`}>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
                 <span className="text-amber-700 text-xs font-bold">{b.guest_name?.charAt(0)}</span>
@@ -127,7 +121,7 @@ export function DashboardTab({
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(b.payment_status)}`}>{b.payment_status}</span>
-              <span className={`text-sm font-semibold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>${b.total_amount?.toLocaleString()}</span>
+              <span className={`text-sm font-semibold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>Ksh. {b.total_amount?.toLocaleString()}</span>
             </div>
           </div>
         ))}

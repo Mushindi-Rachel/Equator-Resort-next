@@ -84,7 +84,7 @@ export function BookingsTab({
                 <td className="px-4 py-3">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(b.payment_status)}`}>{b.payment_status}</span>
                 </td>
-                <td className={`px-4 py-3 text-sm font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>${b.total_amount?.toLocaleString()}</td>
+                <td className={`px-4 py-3 text-sm font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>Ksh.{b.total_amount?.toLocaleString()}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-1">
                     <button onClick={() => onOpenDrawer(b)} title="View"

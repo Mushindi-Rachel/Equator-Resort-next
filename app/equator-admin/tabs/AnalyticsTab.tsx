@@ -25,7 +25,7 @@ export function AnalyticsTab({
     <div className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Avg Booking Value', value: `$${avgBookingValue.toLocaleString()}` },
+          { label: 'Avg Booking Value', value: `Ksh. ${avgBookingValue.toLocaleString()}` },
           { label: 'Occupancy Rate',    value: `${occupancyRate}%` },
           { label: 'Avg Stay (nights)', value: avgStay },
         ].map(s => (

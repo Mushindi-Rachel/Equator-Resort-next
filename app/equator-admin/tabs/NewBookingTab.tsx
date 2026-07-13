@@ -1,10 +1,11 @@
 import { Plus, CheckCircle2 } from 'lucide-react';
 import { nightsBetween } from '../utils';
-import type { Room, NewBookingForm } from '../types';
+import type { Room, NewBookingForm, Category } from "../types";
 
 interface Props {
   darkMode: boolean;
   rooms: Room[];
+  categories: Category[];
   newBooking: NewBookingForm;
   setNewBooking: (fn: (prev: NewBookingForm) => NewBookingForm) => void;
   savingBooking: boolean;
@@ -14,11 +15,22 @@ interface Props {
 }
 
 export function NewBookingTab({
-  darkMode, rooms, newBooking, setNewBooking,
-  savingBooking, bookingError, bookingSuccess, onSubmit,
+  darkMode,
+  rooms,
+  categories,
+  newBooking,
+  setNewBooking,
+  savingBooking,
+  bookingError,
+  bookingSuccess,
+  onSubmit,
 }: Props) {
   const today = new Date().toISOString().split('T')[0];
-  const selectedRoom = rooms.find(r => r.id === newBooking.roomId);
+  const selectedRoom = rooms.find(
+  room =>
+    room.category_id === newBooking.categoryId &&
+    room.status === "Available"
+);
   const pricePerNight =
   selectedRoom && newBooking.packageType
     ? selectedRoom.price[
@@ -138,15 +150,48 @@ export function NewBookingTab({
   </select>
 </div>
             <label className={`block text-[10px] font-semibold tracking-wider uppercase mb-1.5 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Room</label>
-            <select required value={newBooking.roomId} onChange={e => setNewBooking(p => ({ ...p, roomId: e.target.value }))}
-              className={`w-full px-3 py-2.5 rounded-lg border text-sm cursor-none focus:outline-none focus:ring-2 focus:ring-amber-400/30 ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}>
-              <option value="">Select a room</option>
-              {rooms.map((room) => (
-  <option key={room.id} value={room.id}>
-    {room.name}
-  </option>
-))}
-            </select>
+            <select
+  value={newBooking.categoryId}
+  onChange={(e) => {
+  const categoryId = e.target.value;
+
+  const availableRoom = rooms.find(
+    room =>
+      room.category_id === categoryId &&
+      room.status === "Available"
+  );
+
+  setNewBooking((prev) => ({
+    ...prev,
+    categoryId,
+    roomId: availableRoom?.id || "",
+  }));
+}}
+>
+  <option value="">Select category</option>
+
+  {categories.map((category) => (
+    <option key={category.id} value={category.id}>
+      {category.name}
+    </option>
+  ))}
+</select>
+{selectedRoom ? (
+  <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+    <p className="text-sm font-medium">
+      Assigned Room:
+      <span className="ml-2 text-emerald-700">
+        {selectedRoom.room_number} ({selectedRoom.name})
+      </span>
+    </p>
+  </div>
+) : newBooking.categoryId ? (
+  <div className="mt-3 rounded-lg bg-red-50 border border-red-200 p-3">
+    <p className="text-sm text-red-600">
+      No available room in this category.
+    </p>
+  </div>
+) : null}
           </div>
         </div>
 

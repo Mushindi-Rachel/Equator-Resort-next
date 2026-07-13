@@ -12,7 +12,7 @@ export function PaymentsTab({ darkMode, bookings, totalRevenue }: Props) {
     <div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
         {[
-          { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString()}`, color: 'bg-emerald-500' },
+          { label: 'Total Revenue', value: `Ksh. ${totalRevenue.toLocaleString()}`, color: 'bg-emerald-500' },
           { label: 'Paid',    value: bookings.filter(b => b.payment_status === 'paid').length,    color: 'bg-blue-500' },
           { label: 'Pending', value: bookings.filter(b => b.payment_status === 'pending').length,  color: 'bg-amber-500' },
           { label: 'Failed',  value: bookings.filter(b => b.payment_status === 'failed').length,   color: 'bg-red-500' },
@@ -40,7 +40,7 @@ export function PaymentsTab({ darkMode, bookings, totalRevenue }: Props) {
                 <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{b.guest_name}</td>
                 <td className={`px-4 py-3 text-xs uppercase font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{b.payment_method || 'mpesa'}</td>
                 <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{b.mpesa_number || '—'}</td>
-                <td className={`px-4 py-3 text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>${b.total_amount?.toLocaleString()}</td>
+                <td className={`px-4 py-3 text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>Ksh. {b.total_amount?.toLocaleString()}</td>
                 <td className="px-4 py-3">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColor(b.payment_status)}`}>{b.payment_status}</span>
                 </td>
