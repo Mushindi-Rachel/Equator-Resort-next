@@ -461,50 +461,6 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
         }
       />
 
-      <ReportDrawer
-     open={reportDrawerOpen}
-  onClose={() => setReportDrawerOpen(false)}
-  title="Report Preview"
->
-  {selectedReport === "daily" && (
-    <DailyReport
-      bookings={bookings}
-      rooms={rooms}
-    />
-  )}
-
-  {selectedReport === "weekly" && (
-    <WeeklyReport
-      bookings={bookings}
-    />
-  )}
-
-  {selectedReport === "monthly" && (
-    <MonthlyReport
-      bookings={bookings}
-    />
-  )}
-
-  {selectedReport === "occupancy" && (
-    <OccupancyReport
-      rooms={rooms}
-      bookings={bookings}
-    />
-  )}
-
-  {selectedReport === "revenue" && (
-    <RevenueReport
-      bookings={bookings}
-    />
-  )}
-
-  {selectedReport === "guests" && (
-    <GuestReport
-      bookings={bookings}
-    />
-  )}
-<ReportDrawer/>
-
       <Drawer
         open={viewDrawerOpen}
         onClose={() => setViewDrawerOpen(false)}
