@@ -101,29 +101,10 @@ console.log("🔥 NEW QUERY RUNNING");
   .from("rooms")
   .select(`
     *,
-    category:room_categories!rooms_category_id_fkey(
-      id,
-      name,
-      description,
-      image,
-      gallery,
-      bb_price,
-      hb_price,
-      fb_price,
-      bo_price,
-      day_rest_price,
-      max_adults,
-      max_children,
-      size_sqm,
-      beds,
-      view_type,
-      featured
-    )
+    category:room_categories(*)
   `)
   .order("room_number");
-  console.log("ROOMS RESPONSE", roomsRes);
-console.log("ROOMS ERROR", roomsRes.error);
-console.log("ROOMS DATA", roomsRes.data);
+  
     const [reviewsRes] = await Promise.all([
       supabase.from('reviews').select('*').order('created_at', { ascending: false }),
     ]);
@@ -174,12 +155,15 @@ console.log("ROOMS DATA", roomsRes.data);
               ) ?? [],
 
             price: {
-                BB: Number(b.rooms.category?.bb_price ?? 0),
-                HB: Number(b.rooms.category?.hb_price ?? 0),
-                FB: Number(b.rooms.category?.fb_price ?? 0),
-                BO: Number(b.rooms.category?.bo_price ?? 0),
-                DAY_REST: Number(b.rooms.category?.day_rest_price ?? 0),
-              }
+              bb_single: Number(b.rooms.category?.bb_single_price ?? 0),
+              bb_double: Number(b.rooms.category?.bb_double_price ?? 0),
+
+              hb_single: Number(b.rooms.category?.hb_single_price ?? 0),
+              hb_double: Number(b.rooms.category?.hb_double_price ?? 0),
+
+              fb_single: Number(b.rooms.category?.fb_single_price ?? 0),
+              fb_double: Number(b.rooms.category?.fb_double_price ?? 0),
+            }
           }
         : undefined,
     }))
@@ -231,12 +215,15 @@ console.log("ROOMS DATA", roomsRes.data);
     badge: r.category?.beds,
 
     price: {
-      BB: Number(r.category?.bb_price ?? 0),
-      HB: Number(r.category?.hb_price ?? 0),
-      FB: Number(r.category?.fb_price ?? 0),
-      BO: Number(r.category?.bo_price ?? 0),
-      DAY_REST: Number(r.category?.day_rest_price ?? 0),
-    },
+        bb_single: Number(r.category?.bb_single_price ?? 0),
+        bb_double: Number(r.category?.bb_double_price ?? 0),
+
+        hb_single: Number(r.category?.hb_single_price ?? 0),
+        hb_double: Number(r.category?.hb_double_price ?? 0),
+
+        fb_single: Number(r.category?.fb_single_price ?? 0),
+        fb_double: Number(r.category?.fb_double_price ?? 0),
+    }
   }))
 );
 roomsRes.data.forEach(room => {
@@ -245,9 +232,7 @@ roomsRes.data.forEach(room => {
   //   category: room.category,
   //   raw: room,
   // });
-//   console.log("ROOMS DATA:", roomsRes.data);
-// console.log("ROOMS ERROR:", roomsRes.error);
-  
+
 });
 
     }
@@ -535,8 +520,6 @@ const total = nights * pricePerNight;
   .select()
   .single();
 
-console.log("DATA:", data);
-console.log("ERROR:", error);
 
 if (error) throw error;
 
@@ -603,13 +586,7 @@ if (error) throw error;
     loadData();
   };
 
-console.log({
-  totalRooms,
-  occupiedRooms,
-  availableRooms,
-  todayArrivals,
-  todayDepartures,
-});
+
   return {
     // data
     todayArrivals, todayDepartures, totalRooms, occupiedRooms, availableRooms, reservedRooms, cleaningRooms, maintenanceRooms,

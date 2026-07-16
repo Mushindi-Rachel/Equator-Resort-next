@@ -6,11 +6,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
   Phone, ChevronRight, ChevronLeft, Check, CreditCard,
-  Smartphone, Mail, User, Calendar, Users, Shield, ArrowLeft
+  Smartphone, Mail, User, Calendar, Users, Shield, ArrowLeft,
+  Plus, Minus
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-type PackageType = 'BB' | 'HB' | 'FB' | 'BO' | 'DAY_REST';
+type PackageType = 'BB' | 'HB' | 'FB';
+type OccupancyType = 'single' | 'double';
 type PaymentMethod = 'mpesa' | 'visa' | 'mastercard';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -31,11 +33,9 @@ const PACKAGE_LABELS: Record<PackageType, string> = {
   BB: 'Bed & Breakfast',
   HB: 'Half Board',
   FB: 'Full Board',
-  BO: 'Bed Only',
-  DAY_REST: 'Day Rest',
 };
 
-const VALID_PACKAGES: PackageType[] = ['BB', 'HB', 'FB', 'BO', 'DAY_REST'];
+const VALID_PACKAGES: PackageType[] = ['BB', 'HB', 'FB'];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function BookNow() {
@@ -51,7 +51,8 @@ export default function BookNow() {
   const [packageType, setPackageType] = useState<PackageType>('BB');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(1);
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
 
   const [loadingCategory, setLoadingCategory] = useState(true);
   
@@ -132,17 +133,22 @@ useEffect(() => {
 
   // ─── Derived values ───────────────────────────────────────────────────────
   const nights = nightsBetween(checkIn, checkOut);
+  const totalGuests = adults + children;
 
-const selectedPrice =
-  selectedCategory
-    ? selectedCategory[`${packageType.toLowerCase()}_price`] ?? 0
-    : 0;
+  // More than one guest total means the stay is priced as double occupancy.
+  const occupancyType: OccupancyType = totalGuests > 1 ? 'double' : 'single';
 
-const totalAmount =
-  packageType === "DAY_REST"
-    ? selectedPrice
-    : selectedPrice * nights;
-  
+  const MAX_GUESTS = 3;
+
+  const exceedsCapacity = totalGuests > MAX_GUESTS;
+
+  const selectedPrice =
+    selectedCategory
+      ? selectedCategory[`${packageType.toLowerCase()}_${occupancyType}_price`] ?? 0
+      : 0;
+
+  const totalAmount = selectedPrice * nights;
+    
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
   async function handleSubmit() {
@@ -175,7 +181,7 @@ const totalAmount =
   check_in: checkIn,
   check_out: checkOut,
 
-  number_of_guests: guests,
+  number_of_guests: totalGuests,
 
   package_type: packageType,
 
@@ -271,9 +277,10 @@ if (roomUpdateError) throw roomUpdateError;
   const canProceedStep1 =
     selectedCategory &&
     checkIn &&
-    (packageType === "DAY_REST" || checkOut) &&
-    guests > 0 &&
-    (packageType === "DAY_REST" || nights > 0);
+    checkOut &&
+    totalGuests > 0 &&
+    !exceedsCapacity &&
+    nights > 0;
   const canProceedStep2 = name && email && phone;
 
   // ─── Shared summary card ──────────────────────────────────────────────────
@@ -284,10 +291,8 @@ if (roomUpdateError) throw roomUpdateError;
           <div>
             <p className="font-serif text-sanctuary-900 text-[15px]">{selectedCategory?.name}</p>
             <p className="font-sans text-sanctuary-500 text-[12px]">
-              {PACKAGE_LABELS[packageType]} •{' '}
-              {packageType === 'DAY_REST'
-                ? `KSh ${selectedPrice.toLocaleString()}`
-                : `${nights} night${nights !== 1 ? 's' : ''} × KSh ${selectedPrice.toLocaleString()}`}
+              {PACKAGE_LABELS[packageType]} • {occupancyType === 'double' ? 'Double' : 'Single'} occupancy •{' '}
+              {`${nights} night${nights !== 1 ? 's' : ''} × KSh ${selectedPrice.toLocaleString()}`}
             </p>
           </div>
           <p className="font-serif text-sanctuary-900 text-xl">KSh {totalAmount.toLocaleString()}</p>
@@ -422,10 +427,19 @@ if (!selectedCategory) {
             {selectedCategory?.description}
         </p>
 
-        <div className="mt-4 flex gap-6">
+        <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
             <span>
-                From KSh {(selectedCategory?.bb_price ?? 0).toLocaleString()}
+                From KSh {(selectedCategory?.bb_single_price ?? 0).toLocaleString()}
             </span>
+            {(selectedCategory?.max_adults != null || selectedCategory?.max_children != null) && (
+              <span className="text-sanctuary-500 text-sm">
+                Sleeps up to {selectedCategory?.max_adults ?? 0} adult{(selectedCategory?.max_adults ?? 0) !== 1 ? 's' : ''}
+                {selectedCategory?.max_children ? ` or ${selectedCategory.max_children} child${selectedCategory.max_children > 1 ? 'ren' : ''}` : ''}
+              </span>
+            )}
+            {selectedCategory?.beds && (
+              <span className="text-sanctuary-500 text-sm">{selectedCategory.beds} Beds</span>
+            )}
 
         </div>
 
@@ -445,33 +459,21 @@ if (!selectedCategory) {
                 >
                   {selectedCategory && (
 <>
-    {selectedCategory.bb_price > 0 && (
+    {selectedCategory[`bb_${occupancyType}_price`] > 0 && (
         <option value="BB">
-            Bed & Breakfast — KSh {(selectedCategory?.bb_price ?? 0).toLocaleString()}
+            Bed & Breakfast — KSh {selectedCategory[`bb_${occupancyType}_price`].toLocaleString()}
         </option>
     )}
 
-    {selectedCategory.hb_price > 0 && (
+    {selectedCategory[`hb_${occupancyType}_price`] > 0 && (
         <option value="HB">
-            Half Board — KSh {(selectedCategory?.hb_price ?? 0).toLocaleString()}
+            Half Board — KSh {selectedCategory[`hb_${occupancyType}_price`].toLocaleString()}
         </option>
     )}
 
-    {selectedCategory.fb_price > 0 && (
+    {selectedCategory[`fb_${occupancyType}_price`] > 0 && (
         <option value="FB">
-            Full Board — KSh {(selectedCategory?.fb_price ?? 0).toLocaleString()}
-        </option>
-    )}
-
-    {selectedCategory.bo_price > 0 && (
-        <option value="BO">
-            Bed Only — KSh {(selectedCategory?.bo_price ?? 0).toLocaleString()}
-        </option>
-    )}
-
-    {selectedCategory.day_rest_price > 0 && (
-        <option value="DAY_REST">
-            Day Rest — KSh {selectedCategory.day_rest_price.toLocaleString()}
+            Full Board — KSh {selectedCategory[`fb_${occupancyType}_price`].toLocaleString()}
         </option>
     )}
 </>
@@ -479,8 +481,8 @@ if (!selectedCategory) {
                 </select>
               </div>
 
-              {/* Dates & guests */}
-              <div className="grid sm:grid-cols-3 gap-4">
+              {/* Dates */}
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-sans text-[11px] text-sanctuary-400 tracking-wider uppercase mb-2">
                     <Calendar size={12} className="inline mr-1" />Check-in
@@ -502,31 +504,103 @@ if (!selectedCategory) {
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     min={checkIn || new Date().toISOString().split('T')[0]}
-                    disabled={packageType === 'DAY_REST'}
                     className="w-full px-4 py-3 bg-cream-50 border border-sanctuary-100 font-sans text-sanctuary-700 text-sm focus:outline-none focus:border-gold-400 transition-colors disabled:opacity-40"
                   />
-                  {packageType === 'DAY_REST' && (
-                    <p className="text-[11px] text-sanctuary-400 mt-1">Not required for Day Rest</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block font-sans text-[11px] text-sanctuary-400 tracking-wider uppercase mb-2">
-                    <Users size={12} className="inline mr-1" />Guests
-                  </label>
-                  <select
-                    value={guests}
-                    onChange={(e) => setGuests(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-cream-50 border border-sanctuary-100 font-sans text-sanctuary-700 text-sm focus:outline-none focus:border-gold-400 transition-colors"
-                  >
-                    {[1, 2, 3, 4].map((g) => (
-                      <option key={g} value={g}>{g} Guest{g > 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
+              {/* Guests: Adults & Children */}
+              <div>
+                <label className="block font-sans text-[11px] text-sanctuary-400 tracking-wider uppercase mb-2">
+                  <Users size={12} className="inline mr-1" />Guests
+                </label>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {/* Adults */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-cream-50 border border-sanctuary-100">
+                    <div>
+                      <p className="font-sans text-sanctuary-700 text-sm">Adults</p>
+                      <p className="font-sans text-sanctuary-400 text-[11px]">Age 13+</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setAdults((a) => Math.max(1, a - 1))}
+                        disabled={adults <= 1}
+                        aria-label="Decrease adults"
+                        className="w-8 h-8 flex items-center justify-center rounded-full border border-sanctuary-200 text-sanctuary-700 hover:border-gold-400 hover:text-gold-600 disabled:opacity-30 cursor-pointer transition-colors"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-5 text-center font-sans text-sanctuary-900 text-sm">{adults}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                            if (adults + children < MAX_GUESTS) {
+                              setAdults(adults + 1);
+                            }
+                          }}
+                          disabled={adults + children >= MAX_GUESTS}
+                        aria-label="Increase adults"
+                        className="w-8 h-8 flex items-center justify-center rounded-full border border-sanctuary-200 text-sanctuary-700 hover:border-gold-400 hover:text-gold-600 disabled:opacity-30 cursor-pointer transition-colors"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Children */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-cream-50 border border-sanctuary-100">
+                    <div>
+                      <p className="font-sans text-sanctuary-700 text-sm">Children</p>
+                      <p className="font-sans text-sanctuary-400 text-[11px]">Under 13</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setChildren((c) => Math.max(0, c - 1))}
+                        disabled={children <= 0}
+                        aria-label="Decrease children"
+                        className="w-8 h-8 flex items-center justify-center rounded-full border border-sanctuary-200 text-sanctuary-700 hover:border-gold-400 hover:text-gold-600 disabled:opacity-30 cursor-pointer transition-colors"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-5 text-center font-sans text-sanctuary-900 text-sm">{children}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                            if (adults + children < MAX_GUESTS) {
+                              setChildren(children + 1);
+                            }
+                          }}
+                          disabled={adults + children >= MAX_GUESTS}
+                        aria-label="Increase children"
+                        className="w-8 h-8 flex items-center justify-center rounded-full border border-sanctuary-200 text-sanctuary-700 hover:border-gold-400 hover:text-gold-600 disabled:opacity-30 cursor-pointer transition-colors"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {exceedsCapacity && (
+                    <p className="mt-2 text-[12px] text-red-600">
+                      A room can accommodate a maximum of <strong>3 guests</strong>.
+                      Please reduce the number of adults or children, or reserve another room.
+                    </p>
+                  )}
+
+                {!exceedsCapacity && (
+                  <p className="mt-2 text-[11px] text-sanctuary-400">
+                    Booking as {occupancyType === 'double' ? 'double' : 'single'} occupancy.
+                  </p>
+                )}
+              </div>
+              <p className="mt-2 text-sm text-sanctuary-500">
+                  Total Guests: <strong>{totalGuests}</strong> / {MAX_GUESTS}
+                </p>
+
               {/* Price summary — only show when we have enough info */}
-              {selectedCategory && (packageType === 'DAY_REST' || nights > 0) && (
+              {selectedCategory && nights > 0 && (
                 <PriceSummary />
               )}
 
@@ -534,7 +608,7 @@ if (!selectedCategory) {
                 <button
                   onClick={() => setStep(2)}
                   disabled={!canProceedStep1}
-                  className="btn-gold inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-gold inline-flex items-center gap-2 disabled:opacity-40 cursor-pointer"
                 >
                   Continue <ChevronRight size={16} />
                 </button>
@@ -596,7 +670,7 @@ if (!selectedCategory) {
                 <button
                   onClick={() => setStep(3)}
                   disabled={!canProceedStep2}
-                  className="btn-gold inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-gold inline-flex items-center gap-2 disabled:opacity-40 cursor-pointer"
                 >
                   Continue <ChevronRight size={16} />
                 </button>
@@ -637,9 +711,10 @@ if (!selectedCategory) {
                   <div>
                     <p className="font-serif text-gold-400 text-[15px]">{selectedCategory?.name}</p>
                     <p className="font-sans text-cream-100 text-[12px]">
-                      {name} · {PACKAGE_LABELS[packageType]} ·{' '}
-                      {packageType === 'DAY_REST' ? 'Day visit' : `${nights} night${nights !== 1 ? 's' : ''}`} ·{' '}
-                      {guests} guest{guests > 1 ? 's' : ''}
+                      {name} · {PACKAGE_LABELS[packageType]} · {occupancyType === 'double' ? 'Double' : 'Single'} ·{' '}
+                      {`${nights} night${nights !== 1 ? 's' : ''}`} ·{' '}
+                      {adults} adult{adults > 1 ? 's' : ''}
+                      {children > 0 ? `, ${children} child${children > 1 ? 'ren' : ''}` : ''}
                     </p>
                   </div>
                   <p className="font-serif text-gold-400 text-2xl">KSh {totalAmount.toLocaleString()}</p>
@@ -685,9 +760,12 @@ if (!selectedCategory) {
               <div className="bg-cream-50 p-5 max-w-sm mx-auto text-left space-y-2">
                 {[
                   { label: 'Room', value: selectedCategory?.name },
-                  { label: 'Package', value: PACKAGE_LABELS[packageType] },
-                  { label: 'Dates', value: packageType === 'DAY_REST' ? checkIn : `${checkIn} → ${checkOut}` },
-                  { label: 'Guests', value: guests },
+                  { label: 'Package', value: `${PACKAGE_LABELS[packageType]} (${occupancyType === 'double' ? 'Double' : 'Single'})` },
+                  { label: 'Dates', value: `${checkIn} → ${checkOut}` },
+                  {
+                    label: 'Guests',
+                    value: `${adults} adult${adults > 1 ? 's' : ''}${children > 0 ? `, ${children} child${children > 1 ? 'ren' : ''}` : ''}`,
+                  },
                   { label: 'Payment', value: paymentMethod === 'mpesa' ? 'M-Pesa' : paymentMethod === 'visa' ? 'Visa' : 'Mastercard' },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between font-sans text-[13px]">
@@ -703,7 +781,7 @@ if (!selectedCategory) {
 
               <p className="font-sans text-sanctuary-400 text-[12px]">
                 Need help? Call us at{' '}
-                <a href="tel:+254700123456" className="text-gold-600 underline">+254 700 123 456</a>
+                <a href="tel:+254792888828" className="text-gold-600 underline">+254 700 123 456</a>
               </p>
             </div>
           )}

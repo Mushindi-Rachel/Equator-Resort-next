@@ -57,10 +57,8 @@ const executiveRooms = rooms.filter(room =>
             className={`px-3 py-2.5 rounded-lg border text-sm cursor-none focus:outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-700'}`}>
             <option value="all">All Categories</option>
             <option value="Executive">Executive</option>
-            <option value="Deluxe Single">Deluxe Single</option>
-            <option value="Deluxe Double">Deluxe Double</option>
-            <option value="Standard Single">Standard Single</option>
-            <option value="Standard Double">Standard Double</option>
+            <option value="Deluxe">Deluxe </option>
+            <option value="Standard ">Standard</option>
           </select>
           <select value={roomStatusFilter} onChange={e => setRoomStatusFilter(e.target.value)}
             className={`px-3 py-2.5 rounded-lg border text-sm cursor-none focus:outline-none ${darkMode ? 'bg-slate-900 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-700'}`}>
@@ -137,9 +135,15 @@ const executiveRooms = rooms.filter(room =>
               className="mt-3 text-xs text-amber-600 hover:text-amber-700 cursor-none">Clear filters</button>
           </div>
         ) : filteredRooms.map(r => {
-          const priceKeys = Object.keys(r.price);
-          const minPrice = Math.min(...priceKeys.map(k => r.price[k]));
-          const maxPrice = Math.max(...priceKeys.map(k => r.price[k]));
+          const prices = Object.values(r.price)
+            .map(Number)
+            .filter(price => price > 0);
+
+          const minPrice =
+            prices.length > 0 ? Math.min(...prices) : 0;
+
+          const maxPrice =
+            prices.length > 0 ? Math.max(...prices) : 0;
           const statusConfig = {
   Available: {
     dot: 'bg-emerald-500',

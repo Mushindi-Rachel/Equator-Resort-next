@@ -5,31 +5,24 @@ import { Phone, Users, Monitor, Wifi, Coffee, Projector, Mic, Presentation } fro
 
 const spaces = [
   {
-    name: 'Main Conference Hall',
-    capacity: '200 delegates',
-    features: ['HD projector & screen', 'Wireless microphones', 'High-speed WiFi', 'Air conditioning', 'Stage & podium'],
+    name: 'Dome Conference Hall',
+    capacity: 'upto 1,000 delegates',
+    features: ['Screen', 'Wireless microphones', 'High-speed WiFi', 'Stage & podium'],
     rate: 'KSh 15,000 / day',
   },
   {
-    name: 'Mount1',
-    capacity: '20 delegates',
-    features: ['75" smart display', 'Video conferencing', 'Private lounge area', 'Tea & coffee service', 'Whiteboard & flipcharts'],
+    name: 'Mount Horeb',
+    capacity: 'upto 90 delegates',
+    features: ['Smart display', 'Video conferencing', 'Private lounge area', 'Tea & coffee service', 'Whiteboard & flipcharts'],
     rate: 'KSh 8,000 / day',
     image: '/board-room2.jpeg',
   },
   {
-    name: 'Mount2',
-    capacity: '50 delegates',
-    features: ['Projector & screen', 'Sound system', 'Flexible seating', 'Natural daylight', 'Breakout space'],
+    name: 'Mount Zion',
+    capacity: 'upto 30 delegates',
+    features: ['Screen', 'Sound system', 'Flexible seating', 'Natural daylight', 'Breakout space'],
     rate: 'KSh 6,000 / day',
     image: '/board-room1.jpeg',
-  },
-  {
-    name: 'Mount3',
-    capacity: '50 delegates',
-    features: ['Projector & screen', 'Sound system', 'Flexible seating', 'Natural daylight', 'Breakout space'],
-    rate: 'KSh 6,000 / day',
-    image: '/board-room3.jpeg',
   },
 ];
 

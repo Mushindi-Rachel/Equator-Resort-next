@@ -91,7 +91,7 @@ export function BookingDrawer({ open, onClose, booking: b, onUpdateConfirmation 
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">Payment</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                ['Total',    `$${b.total_amount?.toLocaleString()}`],
+                ['Total',    `Ksh. ${b.total_amount?.toLocaleString()}`],
                 ['Status',   b.payment_status],
                 ['Method',   b.payment_method?.toUpperCase() || '—'],
                 ['M-Pesa #', b.mpesa_number || '—'],

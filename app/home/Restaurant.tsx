@@ -108,7 +108,7 @@ export default function Restaurant() {
                 <span>Main Dining Hall & Outdoor Terrace</span>
               </div>
               <a
-                href="tel:+254700123456"
+                href="tel:+254792888828"
                 className="btn-gold inline-flex items-center gap-2"
               >
                 <Phone size={14} />

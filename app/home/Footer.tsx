@@ -69,7 +69,7 @@ export default function Footer({ onBookNow }: FooterProps) {
             <div className="space-y-3">
               {[
                 { icon: MapPin, text: 'The Equator Christian Retreat, Kenya' },
-                { icon: Phone, text: '+254 7' },
+                { icon: Phone, text: '+254 792888828' },
                 { icon: Mail, text: 'equatoresortresservations@gmail.com' },
               ].map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-3">

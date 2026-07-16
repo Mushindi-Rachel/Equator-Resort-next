@@ -101,7 +101,7 @@ export default function Retreats() {
                 <span className="px-3 py-1.5 bg-sanctuary-50 text-sanctuary-600 font-sans text-[11px] tracking-wider">Children's Playground</span>
               </div>
               <a
-                href="tel:+254700123456"
+                href="tel:+254792888828"
                 className="btn-gold inline-flex items-center gap-2"
               >
                 <Phone size={14} />

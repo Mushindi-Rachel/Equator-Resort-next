@@ -11,14 +11,28 @@ interface RoomCategory {
   name: string;
   description: string;
   image: string;
+  gallery: string[];
+
   badge: string | null;
-  bb_price: number;
-  hb_price: number;
-  fb_price: number;
-  bo_price: number;
-  day_rest_price: number;
+
+  bb_single_price: number;
+  bb_double_price: number;
+
+  hb_single_price: number;
+  hb_double_price: number;
+
+  fb_single_price: number;
+  fb_double_price: number;
+
+  max_adults: number;
+  max_children: number;
+  size_sqm: number;
+  beds: string;
+  view_type: string;
+
   display_order: number;
 }
+
 const amenities = [
     "Free WiFi",
     "Smart TV",
@@ -116,7 +130,7 @@ console.log(categories);
                   </div>
                   <div className="text-right">
                     <p className="font-sans text-[11px] text-sanctuary-400 uppercase tracking-wider">from</p>
-                    <p className="font-display text-sanctuary-900 text-2xl">KSh {(category.bb_price ?? 0).toLocaleString()}</p>
+                    <p className="font-display text-sanctuary-900 text-2xl">KSh {(category.bb_single_price ?? 0).toLocaleString()}</p>
                     <p className="font-sans text-[11px] text-sanctuary-400">BB (Bed & Breakfast)</p>
                   </div>
                 </div>
