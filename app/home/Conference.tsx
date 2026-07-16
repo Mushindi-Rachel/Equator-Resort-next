@@ -1,30 +1,21 @@
-'use client'  
-import { useState } from 'react';
-import Image from 'next/image';
-import { Phone, Users, Monitor, Wifi, Coffee, Projector, Mic, Presentation } from 'lucide-react';
+'use client'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Users, Monitor, Wifi, Coffee, Projector, Mic, Presentation, Sun } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-const spaces = [
-  {
-    name: 'Dome Conference Hall',
-    capacity: 'upto 1,000 delegates',
-    features: ['Screen', 'Wireless microphones', 'High-speed WiFi', 'Stage & podium'],
-    rate: 'KSh 15,000 / day',
-  },
-  {
-    name: 'Mount Horeb',
-    capacity: 'upto 90 delegates',
-    features: ['Smart display', 'Video conferencing', 'Private lounge area', 'Tea & coffee service', 'Whiteboard & flipcharts'],
-    rate: 'KSh 8,000 / day',
-    image: '/board-room2.jpeg',
-  },
-  {
-    name: 'Mount Zion',
-    capacity: 'upto 30 delegates',
-    features: ['Screen', 'Sound system', 'Flexible seating', 'Natural daylight', 'Breakout space'],
-    rate: 'KSh 6,000 / day',
-    image: '/board-room1.jpeg',
-  },
-];
+interface ConferenceHall {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  image: string | null;
+  capacity: number;
+  half_day_price: number;
+  full_day_price: number;
+  features: string[] | null;
+  status: 'Available' | 'Unavailable' | 'Maintenance';
+}
 
 const amenities = [
   { icon: Wifi, label: 'High-Speed WiFi' },
@@ -36,12 +27,54 @@ const amenities = [
 ];
 
 export default function Conferences() {
+  const router = useRouter();
+  const [halls, setHalls] = useState<ConferenceHall[]>([]);
   const [activeSpace, setActiveSpace] = useState(0);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    loadHalls();
+  }, []);
+
+  async function loadHalls() {
+  setLoading(true);
+
+  const { data, error } = await supabase
+    .from("conference_halls")
+    .select("*");
+
+  console.log("Conference halls:", data);
+  console.log("Conference error:", error);
+
+  if (!error) {
+    setHalls(data ?? []);
+  }
+
+  setLoading(false);
+}
+  const goToBooking = (hall: ConferenceHall) => {
+    router.push(`/conference-booking?hall=${hall.id}`);
+  };
+
+  if (loading) {
+    return (
+      <section className="py-28">
+        <div className="text-center">Loading conference halls...</div>
+      </section>
+    );
+  }
+
+  if (halls.length === 0) {
+    return null;
+  }
+
+  const current = halls[activeSpace] ?? halls[0];
+
+  console.log(current);
   return (
     <section id="conferences" className="py-28 bg-sanctuary-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16 reveal">
+        <div className="text-center mb-16 ">
           <p className="section-label mb-4">Conferencing</p>
           <div className="section-divider mb-6" />
           <h2 className="font-serif text-sanctuary-900 mb-5" style={{ fontSize: 'clamp(2rem, 4vw, 3.2rem)', lineHeight: '1.15' }}>
@@ -56,11 +89,11 @@ export default function Conferences() {
         </div>
 
         <div className="grid lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-7 reveal reveal-right">
+          <div className="lg:col-span-7">
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              {spaces.map((space, i) => (
+              {halls.map((hall, i) => (
                 <button
-                  key={space.name}
+                  key={hall.id}
                   onClick={() => setActiveSpace(i)}
                   className={`text-left p-5 transition-all duration-300 cursor-none card-luxury
                     ${activeSpace === i
@@ -68,11 +101,18 @@ export default function Conferences() {
                       : 'bg-cream-50 text-sanctuary-700 hover:bg-cream-100'
                     }`}
                 >
-                  <h4 className={`font-serif text-[15px] mb-2 ${activeSpace === i ? 'text-gold-400' : ''}`}>
-                    {space.name}
-                  </h4>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <h4 className={`font-serif text-[15px] ${activeSpace === i ? 'text-gold-400' : ''}`}>
+                      {hall.name}
+                    </h4>
+                    {hall.status !== 'Available' && (
+                      <span className="font-sans text-[9px] tracking-wider uppercase px-2 py-0.5 bg-red-500/20 text-red-500 rounded-full flex-shrink-0">
+                        {hall.status}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 font-sans text-[11px] opacity-70">
-                    <Users size={11} />{space.capacity}
+                    <Users size={11} />up to {hall.capacity} delegates
                   </div>
                 </button>
               ))}
@@ -80,41 +120,64 @@ export default function Conferences() {
 
             <div className="bg-cream-50 p-8 card-luxury">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-serif text-sanctuary-900 text-xl">{spaces[activeSpace].name}</h3>
-                <span className="font-sans text-[13px] text-gold-600 font-medium">
-                  {spaces[activeSpace].rate}
-                </span>
+                <h3 className="font-serif text-sanctuary-900 text-xl">{current.name}</h3>
               </div>
-              <ul className="space-y-3 mb-8">
-                {spaces[activeSpace].features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 font-sans text-sanctuary-600" style={{ fontSize: '15px' }}>
-                    <div className="w-1.5 h-1.5 bg-gold-500 rounded-full flex-shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="tel:+254700123456"
-                className="btn-gold inline-flex items-center gap-2"
+
+              <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                <div className="flex items-center justify-between bg-cream-100 px-4 py-3">
+                  <span className="flex items-center gap-2 font-sans text-[12px] text-sanctuary-500">
+                    <Sun size={13} className="text-gold-500" /> Half Day
+                  </span>
+                  <span className="font-sans text-[13px] text-gold-600 font-medium">
+                    KSh {current.half_day_price.toLocaleString()} / head
+                  </span>
+                </div>
+                <div className="flex items-center justify-between bg-cream-100 px-4 py-3">
+                  <span className="flex items-center gap-2 font-sans text-[12px] text-sanctuary-500">
+                    <Sun size={13} className="text-gold-500" /> Full Day
+                  </span>
+                  <span className="font-sans text-[13px] text-gold-600 font-medium">
+                    KSh {current.full_day_price.toLocaleString()} / head
+                  </span>
+                </div>
+              </div>
+
+              {current.description && (
+                <p className="font-sans text-sanctuary-600 mb-6" style={{ fontSize: '15px' }}>
+                  {current.description}
+                </p>
+              )}
+
+              {current.features && current.features.length > 0 && (
+                <ul className="space-y-3 mb-8">
+                  {current.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-3 font-sans text-sanctuary-600" style={{ fontSize: '15px' }}>
+                      <div className="w-1.5 h-1.5 bg-gold-500 rounded-full flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <button
+                onClick={() => goToBooking(current)}
+                disabled={current.status !== 'Available'}
+                className="btn-gold inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <Phone size={14} />
-                Call Now to Book
-              </a>
+                {current.status === 'Available' ? 'Book Conference Hall' : current.status}
+              </button>
             </div>
           </div>
 
-          <div className="lg:col-span-5 reveal reveal-left">
+          <div className="lg:col-span-5">
             <div className="aspect-[1/0.8] overflow-hidden mb-8">
-              <div
-                  key={activeSpace}
-                  className="aspect-[1/0.8] overflow-hidden mb-8 animate-fadeIn"
-                >
-                    <img
-                      src={spaces[activeSpace].image}
-                      alt={spaces[activeSpace].name}
-                      className="w-full h-full object-cover"
-                    />
-        </div>
+              <div key={current.id} className="aspect-[1/0.8] overflow-hidden mb-8 animate-fadeIn">
+                <img
+                  src={current.image || '/board-room1.jpeg'}
+                  alt={current.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               {amenities.map((amenity) => {

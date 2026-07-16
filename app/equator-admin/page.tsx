@@ -23,6 +23,7 @@ import { AnalyticsTab } from './tabs/AnalyticsTab';
 import { ReportsTab } from './tabs/ReportsTab';
 import { ActivityTab } from './tabs/ActivityTab';
 import { SettingsTab } from './tabs/SettingsTab';
+import { ConferenceBookingsTab } from './tabs/ConferenceBookingsTab';
 
 import type {
   AdminDashboardProps,
@@ -52,8 +53,6 @@ export default function AdminDashboard({ onClose, adminUser }: AdminDashboardPro
     reviews,
     loading,
     activityLog,
-    housekeepingStatus,
-    setHousekeepingStatus,
     categories,
     addRoom,
     updateRoom,
@@ -357,6 +356,11 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
                 onSubmit={handleNewBooking}
               />
           )}
+          {tab === 'conference-bookings' && (
+              <ConferenceBookingsTab
+                darkMode={darkMode}
+              />
+            )}
 
           {tab === 'rooms' && (
             <RoomsTab

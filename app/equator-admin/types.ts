@@ -4,6 +4,7 @@ export type SidebarTab =
   | 'dashboard'
   | 'bookings'
   | 'new-booking'
+  | 'conference-bookings'
   | 'rooms'
   | 'guests'
   | 'payments'

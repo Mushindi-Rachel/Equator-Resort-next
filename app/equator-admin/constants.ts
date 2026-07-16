@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Calendar, Plus, BedDouble, Users, CreditCard,
-  Star, Wrench, BarChart3, FileText, Activity, Settings,
+  Star, Wrench, BarChart3, FileText, Activity, Settings, Building2,
 } from 'lucide-react';
 import type { SidebarTab } from './types';
 
@@ -13,6 +13,7 @@ export const SIDEBAR_ITEMS: {
   { key: 'dashboard',    label: 'Dashboard',    icon: LayoutDashboard },
   { key: 'bookings',     label: 'Bookings',     icon: Calendar,   section: 'Operations' },
   { key: 'new-booking',  label: 'New Booking',  icon: Plus },
+  { key: 'conference-bookings', label: 'Conference Bookings', icon: Building2},
   { key: 'rooms',        label: 'Rooms',        icon: BedDouble },
   { key: 'guests',       label: 'Guests',       icon: Users },
   { key: 'payments',     label: 'Payments',     icon: CreditCard },
