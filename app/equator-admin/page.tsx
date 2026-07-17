@@ -289,12 +289,7 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
   // renders at all, so this is just to avoid a flash of stale/empty data
   // while the client-side session check catches up.
   if (!user || !isAdmin) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-slate-950">
-        <p className="text-slate-400 text-sm">Loading admin dashboard…</p>
-      </div>
-    );
-  }
+
 
   return (
     <div className={`fixed inset-0 flex overflow-hidden cursor-pointer ${darkMode ? 'bg-slate-950' : 'bg-slate-50'}`}>
@@ -561,4 +556,4 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
       />
     </div>
   );
-}
+}}

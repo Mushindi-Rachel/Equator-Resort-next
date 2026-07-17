@@ -1,7 +1,8 @@
 'use client';
 import Image from 'next/image';
 import { LayoutDashboard, Bell, Sun, Moon, UserCircle, LogOut, X } from 'lucide-react';
-import type { AdminDashboardProps, ActivityLog } from '../types';
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function TopBar({
   adminUser,
@@ -24,6 +25,17 @@ export default function TopBar({
   notifOpen: boolean;
   setNotifOpen: (v: boolean) => void;
 }) {
+
+  const router = useRouter();
+const supabase = createClient();
+
+const handleSignOut = async () => {
+  await supabase.auth.signOut();
+
+  // Remove any cached pages
+  router.replace("/equator-admin/login");
+  router.refresh();
+};
   return (
     <div className={`flex items-center justify-between px-5 py-3 flex-shrink-0 border-b ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`} style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
       <div className="flex items-center gap-3">
@@ -105,12 +117,27 @@ export default function TopBar({
           <UserCircle size={15} className={darkMode ? 'text-slate-400' : 'text-slate-500'} />
           <span className={`text-xs ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>{adminUser?.email}</span>
         </div>
-        <button onClick={onClose} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${darkMode ? 'text-slate-400 hover:text-red-400 hover:bg-slate-800' : 'text-slate-500 hover:text-red-500 hover:bg-red-50'}`}>
-          <LogOut size={13} /> Sign out
-        </button>
-        <button onClick={onClose} className={`p-1.5 transition-colors cursor-pointer ${darkMode ? 'text-slate-500 hover:text-slate-200' : 'text-slate-400 hover:text-slate-700'}`}>
-          <X size={16} />
-        </button>
+        <button
+  onClick={handleSignOut}
+  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+    darkMode
+      ? "text-slate-400 hover:text-red-400 hover:bg-slate-800"
+      : "text-slate-500 hover:text-red-500 hover:bg-red-50"
+  }`}
+>
+  <LogOut size={13} />
+  Sign out
+</button>
+        <button
+  onClick={onClose}
+  className={`p-1.5 transition-colors cursor-pointer ${
+    darkMode
+      ? "text-slate-500 hover:text-slate-200"
+      : "text-slate-400 hover:text-slate-700"
+  }`}
+>
+  <X size={16} />
+</button>
       </div>
     </div>
   );
