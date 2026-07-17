@@ -1,14 +1,6 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-/**
- * Supabase client for use in Server Components, Server Actions, and
- * Route Handlers. Reads/writes the auth session via cookies.
- *
- * Usage:
- *   const supabase = await createClient();
- *   const { data: { user } } = await supabase.auth.getUser();
- */
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -20,14 +12,14 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
+
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
           } catch {
-            // Called from a Server Component that can't set cookies directly.
-            // Safe to ignore as long as middleware.ts is refreshing sessions.
+            // Middleware handles cookie updates.
           }
         },
       },

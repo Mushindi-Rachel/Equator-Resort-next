@@ -29,6 +29,10 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  console.log("========== MIDDLEWARE ==========");
+console.log("Path:", request.nextUrl.pathname);
+console.log("User:", user);
+console.log("Cookies:", request.cookies.getAll());
 
   const path = request.nextUrl.pathname;
   const isLoginRoute = path === '/equator-admin/login';

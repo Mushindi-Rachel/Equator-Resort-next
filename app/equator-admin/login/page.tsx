@@ -2,7 +2,9 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 function LoginForm() {
   const router = useRouter();
@@ -15,40 +17,63 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  e.preventDefault();
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+  setError(null);
+  setLoading(true);
+
+  console.log("1. Signing in...");
+
+  const { data, error: signInError } =
+    await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
-    }
+  console.log("2. Sign in response", { data, signInError });
 
-    // Confirm this account is actually an admin before letting the client
-    // believe it's in. The middleware re-checks this server-side too.
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', data.user.id)
-      .maybeSingle();
+  if (signInError) {
+    setError(signInError.message);
+    setLoading(false);
+    return;
+  }
 
-    if (!profile?.is_admin) {
-      await supabase.auth.signOut();
-      setError('This account does not have admin access.');
-      setLoading(false);
-      return;
-    }
+  console.log("3. Fetching profile...");
 
-    router.push('/equator-admin');
-    router.refresh();
-  };
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", data.user.id)
+    .maybeSingle();
 
+  console.log("4. Profile:", profile);
+  console.log("5. Profile Error:", profileError);
+
+  if (profileError) {
+    setError(profileError.message);
+    setLoading(false);
+    return;
+  }
+
+  if (!profile?.is_admin) {
+    await supabase.auth.signOut();
+    setError("This account does not have admin access.");
+    setLoading(false);
+    return;
+  }
+  const session = await supabase.auth.getSession();
+console.log("Session:", session);
+
+const user = await supabase.auth.getUser();
+console.log("User:", user);
+
+  console.log("6. Redirecting...");
+  console.log(document.cookie);
+  router.push("/equator-admin");
+  router.refresh();
+
+  setLoading(false);
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
       <form
