@@ -1,7 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
+import { useAuth } from '@/hooks/useAuth';
 import { useAdminData } from './hooks/useAdminData';
 
 import Sidebar from './components/sidebar';
@@ -26,7 +28,6 @@ import { SettingsTab } from './tabs/SettingsTab';
 import { ConferenceBookingsTab } from './tabs/ConferenceBookingsTab';
 
 import type {
-  AdminDashboardProps,
   EnrichedBooking,
   Room,
   SidebarTab,
@@ -34,7 +35,19 @@ import type {
 
 const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-export default function AdminDashboard({ onClose, adminUser }: AdminDashboardProps) {
+export default function AdminDashboard() {
+  // ── Auth (middleware.ts already verified this server-side; this is just
+  // for reading the current user's info in the UI and handling sign-out) ──
+  const router = useRouter();
+  const { user, isAdmin, signOut } = useAuth();
+  const adminUser = user ? { id: user.id, email: user.email ?? '' } : undefined;
+
+  const onClose = async () => {
+    await signOut();
+    router.push('/equator-admin/login');
+    router.refresh();
+  };
+
   // ── Shell / chrome state ──────────────────────────────────────────────
   const [tab, setTab] = useState<SidebarTab>('dashboard');
   const [darkMode, setDarkMode] = useState(false);
@@ -270,6 +283,18 @@ const filtered = useMemo(() => {
 const [reportOpen, setReportOpen] = useState(false);
 const [reportDrawerOpen, setReportDrawerOpen] = useState(false);
 const [selectedReport, setSelectedReport] = useState<string | null>(null);
+
+  // useAuth resolves the session asynchronously on mount. middleware.ts has
+  // already verified admin access server-side by the time this component
+  // renders at all, so this is just to avoid a flash of stale/empty data
+  // while the client-side session check catches up.
+  if (!user || !isAdmin) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-slate-950">
+        <p className="text-slate-400 text-sm">Loading admin dashboard…</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`fixed inset-0 flex overflow-hidden cursor-pointer ${darkMode ? 'bg-slate-950' : 'bg-slate-50'}`}>

@@ -74,11 +74,6 @@ export interface Room {
   };
 }
 
-export interface AdminDashboardProps {
-  onClose: () => void;
-  adminUser?: { id: string; email: string };
-}
-
 export type EnrichedBooking = Booking & {
   rooms?: Room;
   profiles?: Profile;

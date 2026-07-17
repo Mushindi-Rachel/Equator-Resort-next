@@ -96,7 +96,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 )
   `)
   .order('created_at', { ascending: false });
-console.log("🔥 NEW QUERY RUNNING");
+
   const roomsRes = await supabase
   .from("rooms")
   .select(`
@@ -227,11 +227,7 @@ console.log("🔥 NEW QUERY RUNNING");
   }))
 );
 roomsRes.data.forEach(room => {
-  // console.log({
-  //   room: room.room_number,
-  //   category: room.category,
-  //   raw: room,
-  // });
+  
 
 });
 
@@ -281,7 +277,6 @@ const maintenanceRooms = rooms.filter(
   room => room.status === "Maintenance"
 ).length;
 
-console.log(rooms.map(r => r.status));
 
 const addRoom = async (room: {
   room_number: string;
