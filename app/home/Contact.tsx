@@ -26,7 +26,7 @@ export default function Contact() {
             <div className="space-y-8">
               {[
                 { icon: MapPin, label: 'Location', value: 'The Equator Christian Retreat Center, Kenya' },
-                { icon: Phone, label: 'Phone', value: '+254 700 123 456' },
+                { icon: Phone, label: 'Phone', value: '+254 792888828' },
                 { icon: Mail, label: 'Email', value: 'retreat@equatorchristian.org' },
                 { icon: Clock, label: 'Check-in', value: '2:00 PM' },
               ].map(({ icon: Icon, label, value }) => (
