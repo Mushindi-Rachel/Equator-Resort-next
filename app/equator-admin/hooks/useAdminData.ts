@@ -485,12 +485,15 @@ const getRoomPrice = (
     setSavingBooking(true); setBookingError(''); setBookingSuccess('');
     try {
       const room = rooms.find(r => r.id === newBooking.roomId);
-      if (!room) throw new Error('Room not found');
-      const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
-      const room = rooms.find(r => r.id === newBooking.roomId);
-      if (!room) throw new Error("Room not found");
 
-      const nights = nightsBetween(newBooking.checkIn, newBooking.checkOut);
+      if (!room) {
+        throw new Error("Room not found");
+      }
+
+      const nights = nightsBetween(
+        newBooking.checkIn,
+        newBooking.checkOut
+      );
 
       const pricePerNight = getRoomPrice(
         room,
@@ -500,6 +503,8 @@ const getRoomPrice = (
       );
 
       const total = nights * pricePerNight;
+      const ref = generateRef();
+
       const { data, error } = await supabase
   .from("bookings")
   .insert({
