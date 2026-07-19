@@ -12,22 +12,54 @@ export type Profile = {
   is_admin: boolean;
   created_at: string;
 };
+export type RoomCategory = {
+  id: string;
+  name: string;
+  description: string | null;
+
+  image: string | null;
+  gallery: string[] | null;
+
+  max_adults: number | null;
+  max_children: number | null;
+  size_sqm: number | null;
+
+  beds: string | null;
+  view_type: string | null;
+
+  featured: boolean | null;
+  active: boolean | null;
+
+  display_order: number | null;
+
+  bb_single_price: number | null;
+  bb_double_price: number | null;
+
+  hb_single_price: number | null;
+  hb_double_price: number | null;
+
+  fb_single_price: number | null;
+  fb_double_price: number | null;
+};
 
 export type Room = {
-  id: number;
+  id: string;
   room_number: string;
-  name: string;
-  category: string;
-  description: string;
-  price_per_night: number;
-  size_sqm: number;
-  capacity_adults: number;
-  capacity_children: number;
-  amenities: string[];
-  images: string[];
-  badge: string;
-  is_available: boolean;
-  created_at: string;
+
+  category_id: string | null;
+
+  room_name: string;
+
+  status: string | null;
+
+  rating: number | null;
+
+  featured: boolean | null;
+
+  created_at: string | null;
+  updated_at: string | null;
+
+  room_categories?: RoomCategory;
 };
 
 export type Booking = {

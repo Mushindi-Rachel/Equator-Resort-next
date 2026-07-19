@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import type { Booking } from "@/lib/supabase";
+import type { Room, Review } from "../types";
 
 import {
   Search,
@@ -62,10 +64,14 @@ export default function Rooms({ darkMode }: RoomsProps) {
   // ===========================
 
  const loadData = async () => {
-  const { data: roomsData } = await supabase
-    .from('rooms')
-    .select('*');
+  setLoading(true);
 
+  const { data: roomsData } = await supabase
+    .from("rooms")
+    .select(`
+      *,
+      room_categories(*)
+    `);
   const { data: bookingsData } = await supabase
     .from('bookings')
     .select(`
@@ -81,10 +87,9 @@ export default function Rooms({ darkMode }: RoomsProps) {
   setRooms(roomsData ?? []);
   setBookings(bookingsData ?? []);
   setReviews(reviewsData ?? []);
-};
 
-    setLoading(false);
-  };
+  setLoading(false);
+};
 
   useEffect(() => {
     loadData();
@@ -100,11 +105,8 @@ export default function Rooms({ darkMode }: RoomsProps) {
         roomSearch === '' ||
         room.room_name.toLowerCase().includes(roomSearch.toLowerCase()) ||
         room.room_categories?.name.toLowerCase().includes(roomSearch.toLowerCase()) ||
-        room.room_number.toLowerCase().includes(roomSearch.toLowerCase()) ||
-        (room.amenities ?? []).some((a) =>
-          a.toLowerCase().includes(roomSearch.toLowerCase())
-        );
-
+        room.room_number.toLowerCase().includes(roomSearch.toLowerCase()),
+      
       const matchesCategory =
         roomCategoryFilter === 'all' ||
         room.room_categories?.name === roomCategoryFilter;
@@ -206,7 +208,7 @@ export default function Rooms({ darkMode }: RoomsProps) {
       label: 'Maintenance',
       badge: 'bg-red-50 text-red-700',
     },
-  
+  };
 
 
   if (loading) {
@@ -222,7 +224,7 @@ return(
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by name, category, amenities..."
+            placeholder="Search by name, category.."
             value={roomSearch}
             onChange={e => setRoomSearch(e.target.value)}
             className={`w-full pl-9 pr-4 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/30 ${darkMode ? 'bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-600' : 'bg-white border-slate-200 text-slate-800 placeholder:text-slate-400'}`}
@@ -289,29 +291,34 @@ return(
           <button onClick={() => { setRoomSearch(''); setRoomCategoryFilter('all'); setRoomStatusFilter('all'); }}
             className="mt-3 text-xs text-amber-600 hover:text-amber-700 cursor-none">Clear filters</button>
         </div>
-      ) : filteredRooms.map(r => {
-        const priceKeys = Object.keys(r.price) as Array<keyof typeof r.price>;
-        const minPrice = Math.min(...priceKeys.map(k => r.price[k]));
-        const maxPrice = Math.max(...priceKeys.map(k => r.price[k]));
-        const statusConfig = {
-          available: { dot: 'bg-emerald-500', label: 'Available', bg: 'bg-emerald-50 text-emerald-700' },
-          occupied: { dot: 'bg-blue-500', label: 'Occupied', bg: 'bg-blue-50 text-blue-700' },
-          cleaning: { dot: 'bg-amber-400', label: 'Cleaning', bg: 'bg-amber-50 text-amber-700' },
-          reserved: { dot: 'bg-orange-500', label: 'Reserved', bg: 'bg-orange-50 text-orange-700' },
-          maintenance: { dot: 'bg-red-500', label: 'Maintenance', bg: 'bg-red-50 text-red-700' },
-        };
-        const sc = statusConfig[r.status];
+      ) : filteredRooms.map((r) => {
+    const category = r.room_categories;
+
+    const prices = [
+      Number(category?.bb_single_price ?? 0),
+      Number(category?.bb_double_price ?? 0),
+      Number(category?.hb_single_price ?? 0),
+      Number(category?.hb_double_price ?? 0),
+      Number(category?.fb_single_price ?? 0),
+      Number(category?.fb_double_price ?? 0),
+    ].filter((p) => p > 0);
+
+    const minPrice = prices.length ? Math.min(...prices) : 0;
+    const maxPrice = prices.length ? Math.max(...prices) : 0;
+
+    const sc =
+      statusConfig[r.status as keyof typeof statusConfig] ??
+      statusConfig.available;
 
         return (
           <div key={r.id} className={`rounded-xl border overflow-hidden group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'} hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}>
             {/* Image */}
             <div className="h-48 bg-slate-200 overflow-hidden relative">
-              {r.images && r.images.length > 0 ? (
+              {category?.image ? (
                 <img 
-                  src={r.images[0]} 
-                  alt={r.room_name} 
+                  src={category.image}
+                  alt={r.room_name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-room.jpg'; }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-slate-100">
@@ -334,33 +341,21 @@ return(
 
             <div className="p-5">
               <div className="mb-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className={`font-semibold text-base ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{r.room_name}</p>
-                  {r.badge && (
-                    <span className="text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{r.badge}</span>
-                  )}
-                </div>
+                
                 <div className="flex items-center gap-1">
                   {[1,2,3,4,5].map(i => (
-                    <Star key={i} size={12} className={i <= r.rating ? 'text-amber-500 fill-amber-500' : darkMode ? 'text-slate-700' : 'text-slate-200'} />
+                    <Star key={i} size={12} className={i <= Number(r.rating) ? "fill-amber-500" : darkMode ? "text-amber-500" : "text-slate-300"} />
                   ))}
                 </div>
               </div>
 
               <div className={`flex flex-wrap gap-3 mb-3 text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                <span className="flex items-center gap-1"><User size={12} /> {r.max_adults} Adults</span>
-                <span className="flex items-center gap-1"><Baby size={12} /> {r.max_children} Children</span>
-                <span className="flex items-center gap-1"><Building2 size={12} /> {r.size_sqm}m²</span>
+                <span className="flex items-center gap-1"><User size={12} /> {category?.max_adults} Adults</span>
+                <span className="flex items-center gap-1"><Baby size={12} /> {category?.max_children} Children</span>
+                <span className="flex items-center gap-1"><Building2 size={12} /> {category?.size_sqm}m²</span>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {(r.amenities || []).slice(0, 5).map((a, i) => (
-                  <span key={i} className={`text-[10px] px-2 py-1 rounded-full ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>{a}</span>
-                ))}
-                {(r.amenities || []).length > 5 && (
-                  <span className={`text-[10px] px-2 py-1 rounded-full ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>+{(r.amenities || []).length - 5} more</span>
-                )}
-              </div>
+              
 
               <div className="mb-4">
                 <p className={`text-lg font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>

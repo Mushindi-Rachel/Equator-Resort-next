@@ -32,55 +32,59 @@ export interface ActivityLog {
   message: string;
   type: 'booking' | 'payment' | 'room' | 'review' | 'system';
 }
+export interface RoomCategory {
+  id: string;
+  name: string;
+
+  description: string | null;
+
+  image: string | null;
+  gallery: string[] | null;
+
+  max_adults: number | null;
+  max_children: number | null;
+
+  size_sqm: number | null;
+
+  beds: string | null;
+  view_type: string | null;
+
+  bb_single_price: number | null;
+  bb_double_price: number | null;
+
+  hb_single_price: number | null;
+  hb_double_price: number | null;
+
+  fb_single_price: number | null;
+  fb_double_price: number | null;
+}
 
 export interface Room {
   id: string;
+
   room_number: string;
-  name: string;
 
-  category_id: string;
-  desc: string;
+  room_name: string;
 
-  category: "Standard" | "Deluxe" | "Executive Suite";
-
-  badge: string | null;
-
-  featured: boolean;
+  category_id: string | null;
 
   status:
     | "available"
     | "occupied"
     | "reserved"
+    | "maintenance"
     | "cleaning"
-    | "maintenance";
+    | null;
 
-  max_adults: number;
-  max_children: number;
-  max_guests: number;
+  rating: number | null;
 
-  size_sqm: number;
+  featured: boolean | null;
 
-  rating: number;
+  created_at: string | null;
 
-  created_at: string;
+  updated_at: string | null;
 
-  images: string[];
-
-  amenities: string[];
-
-  price: {
-    bb_single: number;
-    bb_double: number;
-    hb_single: number;
-    hb_double: number;
-    fb_single: number;
-    fb_double: number;
-  };
-}
-
-export interface Category {
-  id: string;
-  name: string;
+  room_categories?: RoomCategory;
 }
 
 export type EnrichedBooking = Booking & {
