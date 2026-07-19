@@ -15,7 +15,7 @@ import Contact from '@/app/home/Contact';
 import Footer from '@/app/home/Footer';
 
 
-// import AuthModal from '@/components/auth/AuthModal';
+import AuthModal from '@/components/auth/AuthModal';
 
 
 import { useScrollReveal } from '@/hooks/useScrollReveal';

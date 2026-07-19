@@ -32,36 +32,38 @@ export type Room = {
 
 export type Booking = {
   id: string;
+  booking_reference: string;
+
   user_id: string | null;
-  room_id: number;
+  room_id: string;
+
+  guest_name: string;
+  guest_email: string | null;
+  guest_phone: string | null;
 
   check_in: string;
   check_out: string;
 
   adults: number;
   children: number;
+  number_of_guests: number;
 
-  guest_name: string;
-  guest_email: string;
-  guest_phone: string;
+  package_type: "BB" | "HB" | "FB" | "BO" | "DAY_REST" | null;
 
-  package_type: "BB" | "HB" | "FB" | "BO" | "DAY_REST";
-
-  payment_method: string;
-  mpesa_number: string;
-  payment_status: string;
+  payment_method: string | null;
+  payment_status: string | null;
+  mpesa_number: string | null;
 
   total_amount: number;
 
-  booking_reference: string;
-  notes: string;
+  booking_status: string | null;
+  confirmation_status: string | null;
 
-  confirmation_status: string;
+  special_requests: string | null;
+  notes: string | null;
 
-  mpesa_transaction_id: string | null;
-  mpesa_checkout_request_id: string | null;
-
-  created_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 
   rooms?: Room;
   profiles?: Profile;
