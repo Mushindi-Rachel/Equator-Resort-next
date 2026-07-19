@@ -104,7 +104,7 @@ export default function Contact() {
                       <Send size={14} />
                       Send Message
                     </button>
-                  </form>
+                 s </form>
                 </>
               )}
             </div>
