@@ -720,7 +720,7 @@ export function ReportsTab({
       Room: r.name,
       'Room #': r.room_number,
       Category: r.category,
-      Status: r.status,
+      Status: r.status ?? '',
       'Max Guests': r.max_guests,
     }));
 

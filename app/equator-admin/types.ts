@@ -59,6 +59,15 @@ export interface RoomCategory {
   fb_double_price: number | null;
 }
 
+export interface RoomPriceMap {
+  bb_single: number;
+  bb_double: number;
+  hb_single: number;
+  hb_double: number;
+  fb_single: number;
+  fb_double: number;
+}
+
 export interface Room {
   id: string;
 
@@ -84,7 +93,23 @@ export interface Room {
 
   updated_at: string | null;
 
-  room_categories?: RoomCategory;
+  // ── Derived / display fields (built from the joined room_categories row) ──
+  name: string;
+  category: string;
+  description: string;
+  images: string[];
+  amenities: string[];
+  max_adults: number;
+  max_children: number;
+  max_guests: number;
+  size_sqm: number;
+  badge: string | null;
+  price: RoomPriceMap;
+}
+
+export interface Category {
+  id: string;
+  name: string;
 }
 
 export type EnrichedBooking = Booking & {

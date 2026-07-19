@@ -180,7 +180,9 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
     category_id: r.category_id,
 
-    room_categories: r.category?.name ?? "",
+    name: r.room_name,
+
+    category: r.category?.name ?? "",
 
     status: r.status,
 
@@ -210,7 +212,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
     size_sqm: r.category?.size_sqm ?? 0,
 
-    badge: r.category?.beds,
+    badge: r.category?.beds ?? null,
 
     price: {
         bb_single: Number(r.category?.bb_single_price ?? 0),
@@ -450,29 +452,25 @@ if (status === "checked_out") {
 };
 const getRoomPrice = (
   room: Room,
-  packageType: "BB" | "HB" | "FB",
+  packageType: "BB" | "HB" | "FB" | "BO" | "DAY_REST",
   adults: number,
   children: number
 ) => {
-  const c = room.room_categories;
+  const p = room.price;
 
   const double = adults + children > 1;
 
-  if (packageType === "BB") {
-    return double
-      ? Number(c?.bb_double_price ?? 0)
-      : Number(c?.bb_single_price ?? 0);
-  }
-
   if (packageType === "HB") {
-    return double
-      ? Number(c?.hb_double_price ?? 0)
-      : Number(c?.hb_single_price ?? 0);
+    return double ? p.hb_double : p.hb_single;
   }
 
-  return double
-    ? Number(c?.fb_double_price ?? 0)
-    : Number(c?.fb_single_price ?? 0);
+  if (packageType === "FB") {
+    return double ? p.fb_double : p.fb_single;
+  }
+
+  // BB, plus BO ("Bed Only") and DAY_REST fall back to the base BB rate
+  // since there are no dedicated price columns for those package types.
+  return double ? p.bb_double : p.bb_single;
 };
 
   // ── Create booking ────────────────────────────────────────────────────────
