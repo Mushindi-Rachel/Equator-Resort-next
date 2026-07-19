@@ -73,7 +73,7 @@ export function BookingsTab({
                     </div>
                   </div>
                 </td>
-                <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{b.rooms?.name || '—'}</td>
+                <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{b.rooms?.room_name || '—'}</td>
                 <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{b.check_in}</td>
                 <td className={`px-4 py-3 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{b.check_out}</td>
                 <td className="px-4 py-3">

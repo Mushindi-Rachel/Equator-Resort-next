@@ -123,7 +123,7 @@ export default function ReportDrawer({
                       </td>
 
                       <td className="py-2">
-                        {b.rooms?.name}
+                        {b.rooms?.room_name}
                       </td>
 
                       <td className="py-2">

@@ -625,7 +625,7 @@ export function ReportsTab({
     const dailyRows: ReportRow[] = [
       ...arrivals.map((b) => ({
         Guest: b.guest_name || 'Guest',
-        Room: b.rooms?.name || '—',
+        Room: b.rooms?.room_name || '—',
         Type: 'Arrival',
         'Check In': b.check_in,
         'Check Out': b.check_out,
@@ -636,7 +636,7 @@ export function ReportsTab({
         .filter((b) => b.check_in !== today)
         .map((b) => ({
           Guest: b.guest_name || 'Guest',
-          Room: b.rooms?.name || '—',
+          Room: b.rooms?.room_name || '—',
           Type: 'Departure',
           'Check In': b.check_in,
           'Check Out': b.check_out,
@@ -655,7 +655,7 @@ export function ReportsTab({
 
     const weeklyRows: ReportRow[] = weekBookings.map((b) => ({
       Guest: b.guest_name || 'Guest',
-      Room: b.rooms?.name || '—',
+      Room: b.rooms?.room_name || '—',
       'Booked On': b.created_at?.split('T')[0] || '—',
       'Check In': b.check_in,
       Nights:
@@ -693,7 +693,7 @@ export function ReportsTab({
 
     const monthlyRows: ReportRow[] = monthBookings.map((b) => ({
       Guest: b.guest_name || 'Guest',
-      Room: b.rooms?.name || '—',
+      Room: b.rooms?.room_name || '—',
       'Booked On': b.created_at?.split('T')[0] || '—',
       'Check In': b.check_in,
       'Check Out': b.check_out,

@@ -111,7 +111,7 @@ const filtered = useMemo(() => {
       b.guest_name?.toLowerCase().includes(q) ||
       b.guest_email?.toLowerCase().includes(q) ||
       b.booking_reference?.toLowerCase().includes(q) ||
-      b.rooms?.name?.toLowerCase().includes(q) ||
+      b.rooms?.room_name?.toLowerCase().includes(q) ||
       b.rooms?.room_number?.toString().includes(q);
 
     const matchesPayment =
@@ -229,7 +229,7 @@ const filtered = useMemo(() => {
   const roomPopularity = useMemo(() => {
     const counts = new Map<string, number>();
     bookings.forEach((b) => {
-      const name = b.rooms?.name;
+      const name = b.rooms?.room_name;
       if (!name) return;
       counts.set(name, (counts.get(name) || 0) + 1);
     });

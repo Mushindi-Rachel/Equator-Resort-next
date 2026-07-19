@@ -129,7 +129,7 @@ export default function Dashboard({
                             </div>
                             <div>
                               <p className={`text-sm font-medium ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{b.guest_name}</p>
-                              <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{b.booking_reference} · {b.rooms?.name}</p>
+                              <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{b.booking_reference} · {b.rooms?.room_name}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">

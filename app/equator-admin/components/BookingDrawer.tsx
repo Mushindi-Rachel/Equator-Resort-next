@@ -44,7 +44,7 @@ export function BookingDrawer({ open, onClose, booking: b, onUpdateConfirmation 
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">Stay Details</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                ['Room',      b.rooms?.name || '—'],
+                ['Room',      b.rooms?.room_name || '—'],
                 ['Room #',    b.rooms?.room_number || '—'],
                 ['Check-in',  b.check_in],
                 ['Check-out', b.check_out],
@@ -188,7 +188,7 @@ export function BookingDrawer({ open, onClose, booking: b, onUpdateConfirmation 
 Thank you for choosing Equator Resort.
 
 Booking Reference: ${b.booking_reference}
-Room: ${b.rooms?.name ?? "-"}
+Room: ${b.rooms?.room_name ?? "-"}
 Package: ${b.package_type ?? "-"}
 Check-in: ${b.check_in}
 Check-out: ${b.check_out}
