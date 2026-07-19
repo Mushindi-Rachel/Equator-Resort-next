@@ -9,7 +9,7 @@ import { useAdminData } from './hooks/useAdminData';
 import Sidebar from './components/sidebar';
 import TopBar from './components/topbar';
 import { BookingDrawer } from './components/BookingDrawer';
-import { Drawer } from './components/Drawer';
+import { Drawer } from './components/drawer';
 import RoomFormModal from './components/RoomFormModal';
 import ReportDrawer from './components/ReportDrawer';
 
