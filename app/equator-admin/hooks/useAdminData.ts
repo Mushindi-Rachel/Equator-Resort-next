@@ -180,7 +180,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
     category_id: r.category_id,
 
-    name: r.category?.name ?? "",
+    room_categories: r.category?.name ?? "",
 
     status: r.status,
 
