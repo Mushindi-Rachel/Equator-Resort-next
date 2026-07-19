@@ -346,7 +346,7 @@ return(
                 </div>
               )}
               <div className="absolute top-3 left-3">
-                <span className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full backdrop-blur-md bg-white/90 shadow-sm ${sc.bg}`}>
+<span className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full backdrop-blur-md bg-white/90 shadow-sm ${sc.badge}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
                   {sc.label}
                 </span>
