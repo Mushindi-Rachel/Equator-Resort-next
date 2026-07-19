@@ -29,13 +29,14 @@ export function NewBookingTab({
   const selectedRoom = rooms.find(
   room =>
     room.category_id === newBooking.categoryId &&
-    room.status === "Available"
+    room.status === "available"
 );
+  const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
   const pricePerNight =
   selectedRoom && newBooking.packageType
     ? selectedRoom.price[
-        newBooking.packageType as keyof typeof selectedRoom.price
-      ]
+        `${newBooking.packageType.toLowerCase()}_${occupancy}` as keyof typeof selectedRoom.price
+      ] ?? 0
     : 0;
 
   return (
@@ -59,7 +60,7 @@ export function NewBookingTab({
               <div key={f.key}>
                 <label className={`block text-[10px] font-semibold tracking-wider uppercase mb-1.5 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{f.label}</label>
                 <input type={f.type} required={f.required} placeholder={f.placeholder}
-                  value={(newBooking as Record<string, unknown>)[f.key] as string}
+                  value={(newBooking as unknown as Record<string, unknown>)[f.key] as string}
                   onChange={e => setNewBooking(p => ({ ...p, [f.key]: e.target.value }))}
                   className={`w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/30 ${darkMode ? 'bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-600' : 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400'}`} />
               </div>
@@ -93,11 +94,11 @@ export function NewBookingTab({
                 <label className={`block text-[10px] font-semibold tracking-wider uppercase mb-1.5 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{f.label}</label>
                 <div className="flex items-center gap-3">
                   <button type="button"
-                    onClick={() => setNewBooking(p => ({ ...p, [f.key]: Math.max(f.min, (p as Record<string, number>)[f.key] - 1) }))}
+                    onClick={() => setNewBooking(p => ({ ...p, [f.key]: Math.max(f.min, (p as unknown as Record<string, number>)[f.key] - 1) }))}
                     className="w-8 h-8 rounded-lg border border-amber-400 text-amber-600 hover:bg-amber-50 flex items-center justify-center font-bold cursor-none text-lg">−</button>
-                  <span className={`w-6 text-center font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{(newBooking as Record<string, number>)[f.key]}</span>
+                  <span className={`w-6 text-center font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{(newBooking as unknown as Record<string, number>)[f.key]}</span>
                   <button type="button"
-                    onClick={() => setNewBooking(p => ({ ...p, [f.key]: Math.min(f.max, (p as Record<string, number>)[f.key] + 1) }))}
+                    onClick={() => setNewBooking(p => ({ ...p, [f.key]: Math.min(f.max, (p as unknown as Record<string, number>)[f.key] + 1) }))}
                     className="w-8 h-8 rounded-lg border border-amber-400 text-amber-600 hover:bg-amber-50 flex items-center justify-center font-bold cursor-none text-lg">+</button>
                 </div>
               </div>
@@ -119,7 +120,7 @@ export function NewBookingTab({
     onChange={(e) =>
       setNewBooking((p) => ({
         ...p,
-        packageType: e.target.value,
+        packageType: e.target.value as NewBookingForm['packageType'],
       }))
     }
     className={`w-full px-3 py-2.5 rounded-lg border text-sm ${
@@ -158,7 +159,7 @@ export function NewBookingTab({
   const availableRoom = rooms.find(
     room =>
       room.category_id === categoryId &&
-      room.status === "Available"
+      room.status === "available"
   );
 
   setNewBooking((prev) => ({

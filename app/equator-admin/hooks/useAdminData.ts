@@ -19,6 +19,7 @@ const DEFAULT_BOOKING: NewBookingForm = {
   children: 0,
 
   roomId: '',
+  categoryId: '',
 
   packageType: 'BB',
 
@@ -151,7 +152,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
       : [],
             amenities:
               b.rooms.room_amenities?.map(
-                (a) => a.amenities.name
+                (a: { amenities: { name: string } }) => a.amenities.name
               ) ?? [],
 
             price: {
@@ -258,23 +259,23 @@ const todayDepartures = bookings.filter(
 const totalRooms = rooms.length;
 
 const occupiedRooms = rooms.filter(
-  room => room.status === "Occupied"
+  room => room.status === "occupied"
 ).length;
 
 const reservedRooms = rooms.filter(
-  room => room.status === "Reserved"
+  room => room.status === "reserved"
 ).length;
 
 const availableRooms = rooms.filter(
-  room => room.status === "Available"
+  room => room.status === "available"
 ).length;
 
 const cleaningRooms = rooms.filter(
-  room => room.status === "Cleaning"
+  room => room.status === "cleaning"
 ).length;
 
 const maintenanceRooms = rooms.filter(
-  room => room.status === "Maintenance"
+  room => room.status === "maintenance"
 ).length;
 
 
@@ -467,10 +468,9 @@ if (status === "checked_out") {
       const room = rooms.find(r => r.id === newBooking.roomId);
       if (!room) throw new Error('Room not found');
       const nights = nightsBetween(newBooking.checkIn, newBooking.checkOut);
-      const pricePerNight =
-  room.price[
-    newBooking.packageType as keyof typeof room.price
-  ] ?? 0;
+      const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
+      const priceKey = `${newBooking.packageType.toLowerCase()}_${occupancy}` as keyof typeof room.price;
+      const pricePerNight = room.price[priceKey] ?? 0;
 
 const total = nights * pricePerNight;
       const ref    = generateRef();

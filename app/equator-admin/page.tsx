@@ -258,7 +258,7 @@ const filtered = useMemo(() => {
 
   // ── Notifications ────────────────────────────────────────────────────────
   const notifications = useMemo(() => {
-    const items = [];
+    const items: { id: string; msg: string; type: 'booking' | 'payment' }[] = [];
     bookings
       .filter((b) => !b.booking_status || b.booking_status === 'pending')
       .forEach((b) =>

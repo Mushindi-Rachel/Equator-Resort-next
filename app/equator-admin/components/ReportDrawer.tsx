@@ -39,7 +39,7 @@ export default function ReportDrawer({
     .reduce((sum, b) => sum + (b.total_amount ?? 0), 0);
 
   const occupied = rooms.filter(
-    r => r.status === 'Occupied'
+    r => r.status === 'occupied'
   ).length;
 
   const occupancy =

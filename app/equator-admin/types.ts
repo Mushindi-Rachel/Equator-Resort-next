@@ -38,11 +38,14 @@ export interface Room {
   room_number: string;
   name: string;
 
+  category_id: string;
   desc: string;
 
   category: "Standard" | "Deluxe" | "Executive Suite";
 
   badge: string | null;
+
+  featured: boolean;
 
   status:
     | "available"
@@ -66,12 +69,18 @@ export interface Room {
   amenities: string[];
 
   price: {
-    BB: number;
-    HB: number;
-    FB: number;
-    BO: number;
-    DAY_REST: number;
+    bb_single: number;
+    bb_double: number;
+    hb_single: number;
+    hb_double: number;
+    fb_single: number;
+    fb_double: number;
   };
+}
+
+export interface Category {
+  id: string;
+  name: string;
 }
 
 export type EnrichedBooking = Booking & {
@@ -93,6 +102,7 @@ export interface NewBookingForm {
   children: number;
 
   roomId: string;
+  categoryId: string;
 
   packageType: 'BB' | 'HB' | 'FB' | 'BO' | 'DAY_REST';
 
@@ -102,11 +112,12 @@ export interface NewBookingForm {
 }
 
 export interface RoomPrice {
-  BB: number;
-  HB: number;
-  FB: number;
-  BO: number;
-  DAY_REST: number;
+  bb_single: number;
+  bb_double: number;
+  hb_single: number;
+  hb_double: number;
+  fb_single: number;
+  fb_double: number;
 }
 
 export interface NewReviewForm {

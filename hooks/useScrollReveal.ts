@@ -20,7 +20,7 @@ export function useScrollReveal() {
   }, []);
 }
 
-export function useRevealOnSection(sectionRef: React.RefObject<HTMLElement>) {
+export function useRevealOnSection(sectionRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (!sectionRef.current) return;
 
