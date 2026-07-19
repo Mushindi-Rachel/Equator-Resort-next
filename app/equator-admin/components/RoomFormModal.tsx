@@ -52,8 +52,8 @@ export default function RoomFormModal({
     room_number: room.room_number,
     room_name: room.room_name,
     category_id: (room as any).category_id ?? '',
-    status: room.status,
-    rating: room.rating,
+    status: room.status ?? "available",
+    rating: room.rating ?? 5,
     featured: room.featured ?? false,
 });
     } else {
