@@ -1,8 +1,8 @@
 'use client';
 
-import KPICard from './KPICard';
-import MiniBarChart from './MiniBarChart';
-import Drawer from './drawer';
+import {KPICard} from './KPICard';
+import {MiniBarChart} from './MiniBarChart';
+import {Drawer} from './drawer';
 import { rooms } from '@/lib/rooms';
 import {
     DoorOpen,

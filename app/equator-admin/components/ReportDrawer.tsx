@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer } from './Drawer';
+import { Drawer } from './drawer';
 import type { EnrichedBooking, Room } from '../types';
 
 interface Props {

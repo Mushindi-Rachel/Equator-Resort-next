@@ -1,5 +1,5 @@
 import { ThumbsUp, XCircle, DoorOpen, DoorClosed, Printer, Mail, Phone, Check } from 'lucide-react';
-import { Drawer } from './Drawer';
+import { Drawer } from './drawer';
 import { statusColor, nightsBetween } from '../utils';
 import type { EnrichedBooking } from '../types';
 
