@@ -48,7 +48,7 @@ export function HousekeepingTab({
     const q = search.toLowerCase();
 
     const matchSearch =
-      room.name.toLowerCase().includes(q) ||
+      room.room_name.toLowerCase().includes(q) ||
       room.room_number.toString().includes(q) ||
       room.category.toLowerCase().includes(q);
 
@@ -170,7 +170,7 @@ export function HousekeepingTab({
                   </p>
 
                   <p className="text-sm text-slate-500">
-                    {room.name}
+                    {room.room_name}
                   </p>
 
                   <p className="text-xs text-slate-400 mt-1">

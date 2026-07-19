@@ -50,7 +50,7 @@ export default function RoomFormModal({
     if (room) {
       setForm({
     room_number: room.room_number,
-    room_name: room.name,
+    room_name: room.room_name,
     category_id: (room as any).category_id ?? '',
     status: room.status,
     rating: room.rating,

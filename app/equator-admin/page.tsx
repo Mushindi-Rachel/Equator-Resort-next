@@ -192,9 +192,9 @@ const filtered = useMemo(() => {
   };
 
   const handleDeleteRoom = async (room: Room) => {
-    if (!window.confirm(`Delete room ${room.name}? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete room ${room.room_name}? This cannot be undone.`)) return;
     await deleteRoom(room.id);
-    addLog(`Room ${room.name} deleted`, 'room');
+    addLog(`Room ${room.room_name} deleted`, 'room');
   };
 
   // ── Derived KPIs ─────────────────────────────────────────────────────────
@@ -397,7 +397,7 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
               setRoomSort={setRoomSort}
               filteredRooms={filteredRooms}
               onView={(room) => { setViewRoom(room); setViewDrawerOpen(true); }}
-              onBookings={(room) => { setSearch(room.name); setTab('bookings'); }}
+              onBookings={(room) => { setSearch(room.room_name); setTab('bookings'); }}
               onEdit={(room) => { setEditingRoom(room); setRoomModalOpen(true); }}
               onDelete={handleDeleteRoom}
               onAddRoom={() => { setEditingRoom(null); setRoomModalOpen(true); }}
@@ -488,7 +488,7 @@ const [selectedReport, setSelectedReport] = useState<string | null>(null);
       <Drawer
         open={viewDrawerOpen}
         onClose={() => setViewDrawerOpen(false)}
-        title={viewRoom ? viewRoom.name : 'Room Details'}
+        title={viewRoom ? viewRoom.room_name : 'Room Details'}
       >
         {viewRoom && (
           <div className="space-y-4 text-sm">

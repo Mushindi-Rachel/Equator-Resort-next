@@ -182,7 +182,7 @@ export function NewBookingTab({
     <p className="text-sm font-medium">
       Assigned Room:
       <span className="ml-2 text-emerald-700">
-        {selectedRoom.room_number} ({selectedRoom.name})
+        {selectedRoom.room_number} ({selectedRoom.room_name})
       </span>
     </p>
   </div>
