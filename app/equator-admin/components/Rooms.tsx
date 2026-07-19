@@ -98,6 +98,22 @@ export default function Rooms({ darkMode }: RoomsProps) {
     // ===========================
   // FILTER ROOMS
   // ===========================
+  const getMinPrice = (room: Room) => {
+  const c = room.room_categories;
+
+  const prices = [
+    c?.bb_single_price,
+    c?.bb_double_price,
+    c?.hb_single_price,
+    c?.hb_double_price,
+    c?.fb_single_price,
+    c?.fb_double_price,
+  ]
+    .map(Number)
+    .filter((p) => p > 0);
+
+  return prices.length ? Math.min(...prices) : 0;
+};
 
   const filteredRooms = [...rooms]
     .filter((room) => {
@@ -105,7 +121,7 @@ export default function Rooms({ darkMode }: RoomsProps) {
         roomSearch === '' ||
         room.room_name.toLowerCase().includes(roomSearch.toLowerCase()) ||
         room.room_categories?.name.toLowerCase().includes(roomSearch.toLowerCase()) ||
-        room.room_number.toLowerCase().includes(roomSearch.toLowerCase()),
+        room.room_number.toLowerCase().includes(roomSearch.toLowerCase())
       
       const matchesCategory =
         roomCategoryFilter === 'all' ||
@@ -121,24 +137,27 @@ export default function Rooms({ darkMode }: RoomsProps) {
         matchesStatus
       );
     })
+    
     .sort((a, b) => {
-      switch (roomSort) {
-        case 'name-desc':
-          return b.room_name.localeCompare(a.room_name);
+  switch (roomSort) {
+    case 'name-desc':
+      return b.room_name.localeCompare(a.room_name);
 
-        case 'price-low':
-          return a.price_per_night - b.price_per_night;
+    case 'price-low':
+      return getMinPrice(a) - getMinPrice(b);
 
-        case 'price-high':
-          return b.price_per_night - a.price_per_night;
+    case 'price-high':
+      return getMinPrice(b) - getMinPrice(a);
 
-        case 'category':
-          return a.room_categories?.name.localeCompare(b.room_categories?.name);
+    case 'category':
+      return (a.room_categories?.name ?? '').localeCompare(
+        b.room_categories?.name ?? ''
+      );
 
-        default:
-          return a.room_name.localeCompare(b.room_name);
-      }
-    });
+    default:
+      return a.room_name.localeCompare(b.room_name);
+  }
+});
 
   // ===========================
   // DASHBOARD STATISTICS
