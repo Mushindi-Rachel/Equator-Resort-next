@@ -111,7 +111,7 @@ export function BookingDrawer({ open, onClose, booking: b, onUpdateConfirmation 
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-400 mb-3">Timeline</p>
             <div className="space-y-2">
               {[
-                { label: 'Created',     done: true, date: new Date(b.created_at).toLocaleDateString() },
+                { label: 'Created',     done: true, date: new Date(b.created_at ?? Date.now()).toLocaleDateString(),},
                 { label: "Confirmed", done: b.confirmation_status === "confirmed",},
                 { label: 'Paid',        done: b.payment_status === 'paid' },
                 {
