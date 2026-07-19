@@ -150,10 +150,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
       : b.rooms.category?.image
       ? [b.rooms.category.image]
       : [],
-            amenities:
-              b.rooms.room_amenities?.map(
-                (a: { amenities: { name: string } }) => a.amenities.name
-              ) ?? [],
+           
 
             price: {
               bb_single: Number(b.rooms.category?.bb_single_price ?? 0),
@@ -179,11 +176,11 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
     room_number: r.room_number,
 
-    name: r.room_name,
+    room_name: r.room_name,
 
     category_id: r.category_id,
 
-    category: r.category?.name ?? "",
+    name: r.category?.name ?? "",
 
     status: r.status,
 
@@ -193,7 +190,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
     created_at: r.created_at,
 
-    desc: r.category?.description ?? "",
+    description: r.category?.description ?? "",
 
     images: r.category?.gallery?.length
       ? r.category.gallery
@@ -227,10 +224,6 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
     }
   }))
 );
-roomsRes.data.forEach(room => {
-  
-
-});
 
     }
     if (reviewsRes.data) setReviews(reviewsRes.data as Review[]);
@@ -455,6 +448,32 @@ if (status === "checked_out") {
     });
   }
 };
+const getRoomPrice = (
+  room: Room,
+  packageType: "BB" | "HB" | "FB",
+  adults: number,
+  children: number
+) => {
+  const c = room.room_categories;
+
+  const double = adults + children > 1;
+
+  if (packageType === "BB") {
+    return double
+      ? Number(c?.bb_double_price ?? 0)
+      : Number(c?.bb_single_price ?? 0);
+  }
+
+  if (packageType === "HB") {
+    return double
+      ? Number(c?.hb_double_price ?? 0)
+      : Number(c?.hb_single_price ?? 0);
+  }
+
+  return double
+    ? Number(c?.fb_double_price ?? 0)
+    : Number(c?.fb_single_price ?? 0);
+};
 
   // ── Create booking ────────────────────────────────────────────────────────
   const handleNewBooking = async (e: React.FormEvent) => {
@@ -467,15 +486,20 @@ if (status === "checked_out") {
     try {
       const room = rooms.find(r => r.id === newBooking.roomId);
       if (!room) throw new Error('Room not found');
-      const nights = nightsBetween(newBooking.checkIn, newBooking.checkOut);
       const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
-      const priceKey = `${newBooking.packageType.toLowerCase()}_${occupancy}` as keyof typeof room.price;
-      const pricePerNight = room.price[priceKey] ?? 0;
+      const room = rooms.find(r => r.id === newBooking.roomId);
+      if (!room) throw new Error("Room not found");
 
-const total = nights * pricePerNight;
-      const ref    = generateRef();
+      const nights = nightsBetween(newBooking.checkIn, newBooking.checkOut);
 
+      const pricePerNight = getRoomPrice(
+        room,
+        newBooking.packageType,
+        newBooking.adults,
+        newBooking.children
+      );
 
+      const total = nights * pricePerNight;
       const { data, error } = await supabase
   .from("bookings")
   .insert({
