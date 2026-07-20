@@ -101,14 +101,14 @@ export default function Rooms({ darkMode }: RoomsProps) {
   const getMinPrice = (room: Room) => {
   const c = room.room_categories;
 
-  const prices = [
-    c?.bb_single_price,
-    c?.bb_double_price,
-    c?.hb_single_price,
-    c?.hb_double_price,
-    c?.fb_single_price,
-    c?.fb_double_price,
-  ]
+ const prices = [
+  room.price.bb_single,
+  room.price.bb_double,
+  room.price.hb_single,
+  room.price.hb_double,
+  room.price.fb_single,
+  room.price.fb_double,
+];
     .map(Number)
     .filter((p) => p > 0);
 
