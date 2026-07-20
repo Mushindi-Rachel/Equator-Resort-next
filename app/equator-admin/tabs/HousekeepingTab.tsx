@@ -56,21 +56,21 @@ export function HousekeepingTab({
 
     if (filter === "all") return true;
 
-    if (filter === "ready") return room.status === "Available";
+    if (filter === "ready") return room.status === "available";
 
-    if (filter === "cleaning") return room.status === "Cleaning";
+    if (filter === "cleaning") return room.status === "cleaning";
 
-    if (filter === "maintenance") return room.status === "Maintenance";
+    if (filter === "maintenance") return room.status === "maintenance";
 
-    if (filter === "occupied") return room.status === "Occupied";
+    if (filter === "occupied") return room.status === "occupied";
 
     return true;
   });
 
-  const ready = rooms.filter((r) => r.status === "Available").length;
-  const cleaning = rooms.filter((r) => r.status === "Cleaning").length;
-  const maintenance = rooms.filter((r) => r.status === "Maintenance").length;
-  const occupied = rooms.filter((r) => r.status === "Occupied").length;
+  const ready = rooms.filter((r) => r.status === "available").length;
+  const cleaning = rooms.filter((r) => r.status === "cleaning").length;
+  const maintenance = rooms.filter((r) => r.status === "maintenance").length;
+  const occupied = rooms.filter((r) => r.status === "occupied").length;
 
   return (
     <div className="space-y-6">
@@ -178,7 +178,7 @@ export function HousekeepingTab({
                   </p>
                 </div>
 
-                <StatusBadge status={room.status ?? "Available"} />
+                <StatusBadge status={room.status ?? "available"} />
               </div>
 
               <div className="mt-5 space-y-2 text-sm">

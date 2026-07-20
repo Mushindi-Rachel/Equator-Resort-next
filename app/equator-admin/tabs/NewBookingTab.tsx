@@ -29,7 +29,7 @@ export function NewBookingTab({
   const selectedRoom = rooms.find(
   room =>
     room.category_id === newBooking.categoryId &&
-    room.status === "Available"
+    room.status === "available"
 );
   const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
   // room_categories only has bb/hb/fb price columns - "Bed Only" and "Day Rest"
@@ -166,7 +166,7 @@ export function NewBookingTab({
   const availableRoom = rooms.find(
     room =>
       room.category_id === categoryId &&
-      room.status === "Available"
+      room.status === "available"
   );
 
   setNewBooking((prev) => ({
