@@ -29,13 +29,20 @@ export function NewBookingTab({
   const selectedRoom = rooms.find(
   room =>
     room.category_id === newBooking.categoryId &&
-    room.status === "available"
+    room.status === "Available"
 );
   const occupancy = newBooking.adults + newBooking.children > 1 ? 'double' : 'single';
+  // room_categories only has bb/hb/fb price columns - "Bed Only" and "Day Rest"
+  // have no dedicated rate, so (matching the actual booking-save logic) they
+  // fall back to the BB rate rather than showing KES 0 in the preview.
+  const priceKey =
+    newBooking.packageType === 'BO' || newBooking.packageType === 'DAY_REST'
+      ? 'BB'
+      : newBooking.packageType;
   const pricePerNight =
-  selectedRoom && newBooking.packageType
+  selectedRoom && priceKey
     ? selectedRoom.price[
-        `${newBooking.packageType.toLowerCase()}_${occupancy}` as keyof typeof selectedRoom.price
+        `${priceKey.toLowerCase()}_${occupancy}` as keyof typeof selectedRoom.price
       ] ?? 0
     : 0;
 
@@ -159,7 +166,7 @@ export function NewBookingTab({
   const availableRoom = rooms.find(
     room =>
       room.category_id === categoryId &&
-      room.status === "available"
+      room.status === "Available"
   );
 
   setNewBooking((prev) => ({

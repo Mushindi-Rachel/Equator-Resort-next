@@ -127,7 +127,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
 
             category:
             b.rooms.category?.name ?? "Standard",
-            badge: b.rooms.badge,
+            badge: b.rooms.category?.beds ?? null,
 
             rating: Number(b.rooms.rating),
 
@@ -191,6 +191,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
     featured: r.featured,
 
     created_at: r.created_at,
+    updated_at: r.updated_at,
 
     description: r.category?.description ?? "",
 
@@ -254,23 +255,23 @@ const todayDepartures = bookings.filter(
 const totalRooms = rooms.length;
 
 const occupiedRooms = rooms.filter(
-  room => room.status === "occupied"
+  room => room.status === "Occupied"
 ).length;
 
 const reservedRooms = rooms.filter(
-  room => room.status === "reserved"
+  room => room.status === "Reserved"
 ).length;
 
 const availableRooms = rooms.filter(
-  room => room.status === "available"
+  room => room.status === "Available"
 ).length;
 
 const cleaningRooms = rooms.filter(
-  room => room.status === "cleaning"
+  room => room.status === "Cleaning"
 ).length;
 
 const maintenanceRooms = rooms.filter(
-  room => room.status === "maintenance"
+  room => room.status === "Maintenance"
 ).length;
 
 

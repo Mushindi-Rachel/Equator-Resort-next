@@ -224,7 +224,7 @@ const executiveRooms = rooms.filter(room =>
                   </div>
                   <div className="flex items-center gap-1">
                     {[1,2,3,4,5].map(i => (
-                      <Star key={i} size={12} className={i <= r.rating ? 'text-amber-500 fill-amber-500' : darkMode ? 'text-slate-700' : 'text-slate-200'} />
+                      <Star key={i} size={12} className={i <= (r.rating ?? 0) ? 'text-amber-500 fill-amber-500' : darkMode ? 'text-slate-700' : 'text-slate-200'} />
                     ))}
                   </div>
                 </div>
