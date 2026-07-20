@@ -255,23 +255,23 @@ const todayDepartures = bookings.filter(
 const totalRooms = rooms.length;
 
 const occupiedRooms = rooms.filter(
-  room => room.status === "Occupied"
+  room => room.status === "occupied"
 ).length;
 
 const reservedRooms = rooms.filter(
-  room => room.status === "Reserved"
+  room => room.status === "reserved"
 ).length;
 
 const availableRooms = rooms.filter(
-  room => room.status === "Available"
+  room => room.status === "available"
 ).length;
 
 const cleaningRooms = rooms.filter(
-  room => room.status === "Cleaning"
+  room => room.status === "cleaning"
 ).length;
 
 const maintenanceRooms = rooms.filter(
-  room => room.status === "Maintenance"
+  room => room.status === "maintenance"
 ).length;
 
 
