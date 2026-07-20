@@ -401,7 +401,7 @@ await supabase
   await supabase
     .from("rooms")
     .update({
-      status: "Reserved",
+      status: "reserved",
     })
     .eq("id", booking.room_id);
 }
@@ -417,7 +417,7 @@ if (status === "checked_in") {
   await supabase
     .from("rooms")
     .update({
-      status: "Occupied",
+      status: "occupied",
     })
     .eq("id", booking.room_id);
 }
@@ -433,7 +433,7 @@ if (status === "checked_out") {
   await supabase
     .from("rooms")
     .update({
-      status: "Available",
+      status: "available",
     })
     .eq("id", booking.room_id);
 }
