@@ -112,8 +112,34 @@ export interface Category {
   name: string;
 }
 
+// ── Shape of the `rooms` object attached to each booking in useAdminData. ──
+// This is deliberately its OWN type rather than `Room`: it's built by hand
+// from the Supabase join in useAdminData.ts and only ever contains these
+// fields. Keeping it separate from `Room` (which describes the Rooms tab's
+// data) means the object literal in useAdminData.ts can be checked against
+// this exact shape with `satisfies`, so a future rename (e.g. `room_name` ->
+// `name`) fails the build instead of silently rendering as `—` in the UI.
+export interface BookingRoomInfo {
+  id: string;
+  room_number: string;
+  room_name: string;
+  name: string;
+  desc: string;
+  category: string;
+  badge: string | null;
+  rating: number;
+  status: Room['status'];
+  max_adults: number;
+  max_children: number;
+  max_guests: number;
+  size_sqm: number;
+  created_at: string | null;
+  images: string[];
+  price: RoomPriceMap;
+}
+
 export type EnrichedBooking = Booking & {
-  rooms?: Room;
+  rooms?: BookingRoomInfo;
   profiles?: Profile;
   confirmation_status?: string;
   mpesa_transaction_id?: string;

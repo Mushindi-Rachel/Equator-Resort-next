@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { generateRef, nightsBetween } from '../utils';
 import type {
-  EnrichedBooking, Room, Review, ActivityLog,
+  EnrichedBooking, Room, BookingRoomInfo, Review, ActivityLog,
   NewBookingForm, NewReviewForm, SettingsForm,
 } from '../types';
 
@@ -116,11 +116,12 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
       ...b,
 
       rooms: b.rooms
-        ? {
+        ? ({
             id: b.rooms.id,
 
             room_number: b.rooms.room_number,
 
+            room_name: b.rooms.room_name,
             name: b.rooms.room_name,
 
             desc: b.rooms.description ?? "",
@@ -162,7 +163,7 @@ export function useAdminData(adminUser?: { id: string; email: string }) {
               fb_single: Number(b.rooms.category?.fb_single_price ?? 0),
               fb_double: Number(b.rooms.category?.fb_double_price ?? 0),
             }
-          }
+          } satisfies BookingRoomInfo)
         : undefined,
     }))
   );

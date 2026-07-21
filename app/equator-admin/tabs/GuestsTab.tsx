@@ -33,7 +33,7 @@ export function GuestsTab({ darkMode, guests }: Props) {
               <td className={`px-5 py-3.5 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{g.email || '—'}</td>
               <td className={`px-5 py-3.5 text-sm font-semibold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>{g.bookings.length}</td>
               <td className={`px-5 py-3.5 text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{g.bookings[0]?.check_in || '—'}</td>
-              <td className={`px-5 py-3.5 text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>${g.spend.toLocaleString()}</td>
+              <td className={`px-5 py-3.5 text-sm font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>Ksh. {g.spend.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
