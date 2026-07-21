@@ -256,23 +256,23 @@ const todayDepartures = bookings.filter(
 const totalRooms = rooms.length;
 
 const occupiedRooms = rooms.filter(
-  room => room.status === "occupied"
+  room => room.status === "Occupied"
 ).length;
 
 const reservedRooms = rooms.filter(
-  room => room.status === "reserved"
+  room => room.status === "Reserved"
 ).length;
 
 const availableRooms = rooms.filter(
-  room => room.status === "available"
+  room => room.status === "Available"
 ).length;
 
 const cleaningRooms = rooms.filter(
-  room => room.status === "cleaning"
+  room => room.status === "Cleaning"
 ).length;
 
 const maintenanceRooms = rooms.filter(
-  room => room.status === "maintenance"
+  room => room.status === "Maintenance"
 ).length;
 
 
@@ -585,10 +585,10 @@ if (error) throw error;
 ) => {
   const roomStatus =
     status === "clean"
-      ? "Available"
+      ? "available"
       : status === "cleaning"
-      ? "Cleaning"
-      : "Maintenance";
+      ? "cleaning"
+      : "maintenance";
 
   const { error } = await supabase
     .from("rooms")

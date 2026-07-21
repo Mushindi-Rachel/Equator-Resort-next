@@ -78,11 +78,11 @@ export interface Room {
   category_id: string | null;
 
   status:
-    | "available"
-    | "occupied"
-    | "reserved"
-    | "maintenance"
-    | "cleaning"
+    | "Available"
+    | "Occupied"
+    | "Reserved"
+    | "Maintenance"
+    | "Cleaning"
     | null;
 
   rating: number | null;
